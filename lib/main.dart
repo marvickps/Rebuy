@@ -4,15 +4,15 @@ import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'providers/auth_provider.dart';
-// import 'providers/product_provider.dart';
-// import 'providers/chat_provider.dart';
-// import 'providers/user_provider.dart';
-// import 'screens/splash_screen.dart';
-// import 'screens/auth/login_screen.dart';
-// import 'screens/home/home_screen.dart';
-// import 'screens/auth/signup_screen.dart';
-// import 'screens/product/add_product_screen.dart';
-// import 'screens/product/product_detail_screen.dart';
+import 'providers/product_provider.dart';
+import 'providers/chat_provider.dart';
+import 'providers/user_provider.dart';
+import 'screens/splash_screen.dart';
+import 'screens/auth/login_screen.dart';
+import 'screens/home/home_screen.dart';
+import 'screens/auth/signup_screen.dart';
+import 'screens/product/add_product_screen.dart';
+import 'screens/product/product_detail_screen.dart';
 // import 'screens/chat/chat_list_screen.dart';
 // import 'screens/chat/chat_screen.dart';
 // import 'screens/profile/profile_screen.dart';
@@ -32,9 +32,9 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
-        // ChangeNotifierProvider(create: (_) => ProductProvider()),
-        // ChangeNotifierProvider(create: (_) => ChatProvider()),
-        // ChangeNotifierProvider(create: (_) => UserProvider()),
+        ChangeNotifierProvider(create: (_) => ProductProvider()),
+        ChangeNotifierProvider(create: (_) => ChatProvider()),
+        ChangeNotifierProvider(create: (_) => UserProvider()),
       ],
       child: MaterialApp(
         title: 'OLX Clone',
@@ -72,13 +72,13 @@ class MyApp extends StatelessWidget {
             ),
           ),
         ),
-        // home: const SplashScreen(),
+        home: const SplashScreen(),
         routes: {
-          // '/login': (context) => const LoginScreen(),
-          // '/signup': (context) => const SignupScreen(),
-          // '/home': (context) => const HomeScreen(),
-          // '/add-product': (context) => const AddProductScreen(),
-          // '/product-detail': (context) => const ProductDetailScreen(),
+          '/login': (context) => const LoginScreen(),
+          '/signup': (context) => const SignupScreen(),
+          '/home': (context) => const HomeScreen(),
+          '/add-product': (context) => const AddProductScreen(),
+          '/product-detail': (context) => const ProductDetailScreen(),
           // '/chat-list': (context) => const ChatListScreen(),
           // '/chat': (context) => const ChatScreen(),
           // '/profile': (context) => const ProfileScreen(),
