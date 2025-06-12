@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "228460007933",
+    "project_id": "rebuy-8ef1f",
+    "storage_bucket": "rebuy-8ef1f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:228460007933:android:b8948ec41970389eca4994",
+        "android_client_info": {
+          "package_name": "com.rebuy.rebuy"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBGx-tmLDhLVkmGKy8grtSc1Ia_KVBCve4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
