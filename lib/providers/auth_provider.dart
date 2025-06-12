@@ -6,7 +6,7 @@ import '../models/user_model.dart';
 class AuthProvider extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  
+
   User? _user;
   UserModel? _userModel;
   bool _isLoading = false;
@@ -32,7 +32,7 @@ class AuthProvider extends ChangeNotifier {
 
   Future<void> _loadUserData() async {
     if (_user == null) return;
-    
+
     try {
       final doc = await _firestore.collection('users').doc(_user!.uid).get();
       if (doc.exists) {
@@ -43,6 +43,7 @@ class AuthProvider extends ChangeNotifier {
       }
     } catch (e) {
       _errorMessage = 'Failed to load user data: ${e.toString()}';
+      print('Error loading user data: $e'); // Debug print
       notifyListeners();
     }
   }
@@ -57,10 +58,14 @@ class AuthProvider extends ChangeNotifier {
       _setLoading(true);
       _clearError();
 
+      print('Starting signup process...'); // Debug print
+
       final UserCredential result = await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
+
+      print('User created in Auth: ${result.user?.uid}'); // Debug print
 
       if (result.user != null) {
         final userModel = UserModel(
@@ -71,21 +76,38 @@ class AuthProvider extends ChangeNotifier {
           createdAt: DateTime.now(),
         );
 
+        print('Saving user to Firestore...'); // Debug print
+        print('User data: ${userModel.toMap()}'); // Debug print
+
+        // Save to Firestore with more detailed error handling
         await _firestore
             .collection('users')
             .doc(result.user!.uid)
-            .set(userModel.toMap());
+            .set(userModel.toMap())
+            .timeout(
+          const Duration(seconds: 10),
+          onTimeout: () {
+            throw Exception('Firestore write operation timed out');
+          },
+        );
+
+        print('User saved to Firestore successfully'); // Debug print
 
         _userModel = userModel;
         _setLoading(false);
         return true;
       }
     } on FirebaseAuthException catch (e) {
+      print('FirebaseAuth Error: ${e.code} - ${e.message}'); // Debug print
       _setError(_getAuthErrorMessage(e.code));
+    } on FirebaseException catch (e) {
+      print('Firestore Error: ${e.code} - ${e.message}'); // Debug print
+      _setError('Database error: ${e.message}');
     } catch (e) {
+      print('General Error: $e'); // Debug print
       _setError('An unexpected error occurred: ${e.toString()}');
     }
-    
+
     _setLoading(false);
     return false;
   }
@@ -110,7 +132,7 @@ class AuthProvider extends ChangeNotifier {
     } catch (e) {
       _setError('An unexpected error occurred: ${e.toString()}');
     }
-    
+
     _setLoading(false);
     return false;
   }
@@ -136,7 +158,7 @@ class AuthProvider extends ChangeNotifier {
 
     try {
       _setLoading(true);
-      
+
       final updatedUser = _userModel!.copyWith(
         name: name,
         phone: phone,
@@ -166,6 +188,7 @@ class AuthProvider extends ChangeNotifier {
         'lastSeen': DateTime.now().toIso8601String(),
       });
     } catch (e) {
+      print('Error updating online status: $e'); // Debug print
       // Silently handle online status errors
     }
   }
@@ -177,7 +200,7 @@ class AuthProvider extends ChangeNotifier {
       final favorites = List<String>.from(_userModel!.favorites);
       if (!favorites.contains(productId)) {
         favorites.add(productId);
-        
+
         await _firestore.collection('users').doc(_user!.uid).update({
           'favorites': favorites,
         });
@@ -197,7 +220,7 @@ class AuthProvider extends ChangeNotifier {
       final favorites = List<String>.from(_userModel!.favorites);
       if (favorites.contains(productId)) {
         favorites.remove(productId);
-        
+
         await _firestore.collection('users').doc(_user!.uid).update({
           'favorites': favorites,
         });
@@ -214,6 +237,18 @@ class AuthProvider extends ChangeNotifier {
     return _userModel?.favorites.contains(productId) ?? false;
   }
 
+  // Method to manually verify Firestore connection
+  Future<bool> testFirestoreConnection() async {
+    try {
+      await _firestore.collection('test').add({'timestamp': DateTime.now()});
+      print('Firestore connection test successful');
+      return true;
+    } catch (e) {
+      print('Firestore connection test failed: $e');
+      return false;
+    }
+  }
+
   void _setLoading(bool loading) {
     _isLoading = loading;
     notifyListeners();
@@ -221,6 +256,7 @@ class AuthProvider extends ChangeNotifier {
 
   void _setError(String error) {
     _errorMessage = error;
+    print('Auth Error: $error'); // Debug print
     notifyListeners();
   }
 
