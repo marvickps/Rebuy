@@ -8,7 +8,7 @@ import '../../providers/product_provider.dart';
 import '../../providers/auth_provider.dart';
 
 import 'widgets/image_carousel.dart';
-import '../widgets/product_card.dart';
+import 'widgets/product_card.dart';
 import 'add_product_screen.dart';
 
 class ProductDetailScreen extends StatefulWidget {
@@ -101,7 +101,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     if (_product == null) return;
 
     try {
-      final success = await authProvider.toggleFavorite(_product!.id);
+      final success = await authProvider.`toggleFavorite`(_product!.id);
       if (success) {
         setState(() {
           _isFavorite = !_isFavorite;
