@@ -101,7 +101,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     if (_product == null) return;
 
     try {
-      final success = await authProvider.`toggleFavorite`(_product!.id);
+      final success = await authProvider.toggleFavorite(_product!.id);
       if (success) {
         setState(() {
           _isFavorite = !_isFavorite;

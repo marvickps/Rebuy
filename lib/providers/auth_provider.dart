@@ -193,6 +193,32 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
+  Future<bool> toggleFavorite(String productId) async {
+    if (_userModel == null) return false;
+
+    try {
+      final favorites = List<String>.from(_userModel!.favorites);
+      bool isCurrentlyFavorite = favorites.contains(productId);
+
+      if (isCurrentlyFavorite) {
+        favorites.remove(productId);
+      } else {
+        favorites.add(productId);
+      }
+
+      await _firestore.collection('users').doc(_user!.uid).update({
+        'favorites': favorites,
+      });
+
+      _userModel = _userModel!.copyWith(favorites: favorites);
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _setError('Failed to update favorites: ${e.toString()}');
+      return false;
+    }
+  }
+
   Future<void> addToFavorites(String productId) async {
     if (_userModel == null) return;
 
