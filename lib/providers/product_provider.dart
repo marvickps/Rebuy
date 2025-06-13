@@ -117,45 +117,107 @@ class ProductProvider extends ChangeNotifier {
       _setLoading(true);
       _clearError();
 
+      print('Starting product addition...');
+      print('Images count: ${images.length}');
+
       final productId = _uuid.v4();
-      
-      // Upload images
+      print('Generated product ID: $productId');
+
+      // Upload images first
       List<String> imageUrls = [];
-      for (int i = 0; i < images.length; i++) {
-        final ref = _storage.ref().child('products/$productId/image_$i.jpg');
-        await ref.putFile(images[i]);
-        final url = await ref.getDownloadURL();
-        imageUrls.add(url);
+      if (images.isNotEmpty) {
+        print('Uploading ${images.length} images...');
+        for (int i = 0; i < images.length; i++) {
+          try {
+            print('Uploading image ${i + 1}/${images.length}...');
+            final fileName = 'image_${DateTime.now().millisecondsSinceEpoch}_$i.jpg';
+            final ref = _storage.ref().child('products/$productId/$fileName');
+
+            // Upload with metadata
+            final metadata = SettableMetadata(
+              contentType: 'image/jpeg',
+            );
+
+            final uploadTask = ref.putFile(images[i], metadata);
+
+            // Monitor upload progress
+            uploadTask.snapshotEvents.listen((TaskSnapshot snapshot) {
+              print('Upload ${i + 1} progress: ${(snapshot.bytesTransferred / snapshot.totalBytes * 100).round()}%');
+            });
+
+            await uploadTask;
+            final url = await ref.getDownloadURL();
+            imageUrls.add(url);
+            print('Image ${i + 1} uploaded successfully: $url');
+          } catch (e) {
+            print('Error uploading image ${i + 1}: $e');
+            throw Exception('Failed to upload image ${i + 1}: $e');
+          }
+        }
       }
 
+      print('All images uploaded. URLs: $imageUrls');
+
+      // Create product with proper data types
+      final now = DateTime.now();
+      final productData = {
+        'id': productId,
+        'title': title.trim(),
+        'description': description.trim(),
+        'price': price,
+        'category': category.name,
+        'condition': condition.name,
+        'imageUrls': imageUrls,
+        'sellerId': sellerId,
+        'sellerName': sellerName.trim(),
+        'sellerPhone': sellerPhone.trim(),
+        'location': location.trim(),
+        'createdAt': Timestamp.fromDate(now),
+        'updatedAt': Timestamp.fromDate(now),
+        'isAvailable': true,
+        'views': 0,
+        'tags': tags.map((tag) => tag.trim()).where((tag) => tag.isNotEmpty).toList(),
+      };
+
+      print('Saving product to Firestore...');
+      print('Product data: $productData');
+
+      // Save to Firestore with proper error handling
+      await _firestore
+          .collection('products')
+          .doc(productId)
+          .set(productData);
+
+      print('Product saved to Firestore successfully!');
+
+      // Create ProductModel for local state
       final product = ProductModel(
         id: productId,
-        title: title,
-        description: description,
+        title: title.trim(),
+        description: description.trim(),
         price: price,
         category: category,
         condition: condition,
         imageUrls: imageUrls,
         sellerId: sellerId,
-        sellerName: sellerName,
-        sellerPhone: sellerPhone,
-        location: location,
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-        tags: tags,
+        sellerName: sellerName.trim(),
+        sellerPhone: sellerPhone.trim(),
+        location: location.trim(),
+        createdAt: now,
+        updatedAt: now,
+        tags: tags.map((tag) => tag.trim()).where((tag) => tag.isNotEmpty).toList(),
       );
 
-      await _firestore
-          .collection('products')
-          .doc(productId)
-          .set(product.toMap());
-
+      // Update local state
       _products.insert(0, product);
       _myProducts.insert(0, product);
       _applyFilters();
       _setLoading(false);
+
+      print('Product added successfully to local state');
       return true;
     } catch (e) {
+      print('Error adding product: $e');
       _setError('Failed to add product: ${e.toString()}');
       _setLoading(false);
       return false;
@@ -167,10 +229,32 @@ class ProductProvider extends ChangeNotifier {
       _setLoading(true);
       _clearError();
 
+      print('Updating product: ${product.id}');
+
+      // Prepare update data
+      final updateData = {
+        'title': product.title,
+        'description': product.description,
+        'price': product.price,
+        'category': product.category.name,
+        'condition': product.condition.name,
+        'location': product.location,
+        'updatedAt': Timestamp.fromDate(DateTime.now()),
+        'isAvailable': product.isAvailable,
+        'tags': product.tags,
+      };
+
+      // Only update imageUrls if they exist (in case of image updates)
+      if (product.imageUrls.isNotEmpty) {
+        updateData['imageUrls'] = product.imageUrls;
+      }
+
       await _firestore
           .collection('products')
           .doc(product.id)
-          .update(product.toMap());
+          .update(updateData);
+
+      print('Product updated in Firestore successfully');
 
       // Update in local lists
       final index = _products.indexWhere((p) => p.id == product.id);
@@ -187,6 +271,7 @@ class ProductProvider extends ChangeNotifier {
       _setLoading(false);
       return true;
     } catch (e) {
+      print('Error updating product: $e');
       _setError('Failed to update product: ${e.toString()}');
       _setLoading(false);
       return false;
@@ -198,6 +283,8 @@ class ProductProvider extends ChangeNotifier {
       _setLoading(true);
       _clearError();
 
+      print('Deleting product: $productId');
+
       await _firestore.collection('products').doc(productId).delete();
 
       // Delete images from storage
@@ -207,8 +294,10 @@ class ProductProvider extends ChangeNotifier {
         for (final item in listResult.items) {
           await item.delete();
         }
+        print('Product images deleted from storage');
       } catch (e) {
-        // Ignore storage deletion errors
+        print('Error deleting storage files (non-critical): $e');
+        // Don't fail the entire operation if storage cleanup fails
       }
 
       _products.removeWhere((p) => p.id == productId);
@@ -216,8 +305,11 @@ class ProductProvider extends ChangeNotifier {
       _favoriteProducts.removeWhere((p) => p.id == productId);
       _applyFilters();
       _setLoading(false);
+
+      print('Product deleted successfully');
       return true;
     } catch (e) {
+      print('Error deleting product: $e');
       _setError('Failed to delete product: ${e.toString()}');
       _setLoading(false);
       return false;
@@ -226,17 +318,23 @@ class ProductProvider extends ChangeNotifier {
 
   Future<ProductModel?> getProduct(String productId) async {
     try {
+      print('Fetching product: $productId');
+
       final doc = await _firestore.collection('products').doc(productId).get();
-      if (doc.exists) {
+      if (doc.exists && doc.data() != null) {
         final product = ProductModel.fromMap(doc.data()!);
+
         // Increment view count
         await _firestore.collection('products').doc(productId).update({
           'views': FieldValue.increment(1),
         });
+
         return product.copyWith(views: product.views + 1);
       }
+      print('Product not found: $productId');
       return null;
     } catch (e) {
+      print('Error getting product: $e');
       _setError('Failed to get product: ${e.toString()}');
       return null;
     }
@@ -270,9 +368,9 @@ class ProductProvider extends ChangeNotifier {
     if (_searchQuery.isNotEmpty) {
       filtered = filtered.where((p) {
         return p.title.toLowerCase().contains(_searchQuery) ||
-               p.description.toLowerCase().contains(_searchQuery) ||
-               p.tags.any((tag) => tag.toLowerCase().contains(_searchQuery)) ||
-               p.location.toLowerCase().contains(_searchQuery);
+            p.description.toLowerCase().contains(_searchQuery) ||
+            p.tags.any((tag) => tag.toLowerCase().contains(_searchQuery)) ||
+            p.location.toLowerCase().contains(_searchQuery);
       }).toList();
     }
 
@@ -294,6 +392,7 @@ class ProductProvider extends ChangeNotifier {
           .map((doc) => ProductModel.fromMap(doc.data()))
           .toList();
     } catch (e) {
+      print('Error getting products by category: $e');
       return [];
     }
   }
@@ -316,6 +415,7 @@ class ProductProvider extends ChangeNotifier {
 
       return products;
     } catch (e) {
+      print('Error getting related products: $e');
       return [];
     }
   }
@@ -327,6 +427,7 @@ class ProductProvider extends ChangeNotifier {
 
   void _setError(String error) {
     _errorMessage = error;
+    print('ProductProvider Error: $error');
     notifyListeners();
   }
 

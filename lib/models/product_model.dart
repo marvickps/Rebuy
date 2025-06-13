@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 enum ProductCategory {
   electronics,
   vehicles,
@@ -64,8 +66,8 @@ class ProductModel {
       'sellerName': sellerName,
       'sellerPhone': sellerPhone,
       'location': location,
-      'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt.toIso8601String(),
+      'createdAt': Timestamp.fromDate(createdAt),
+      'updatedAt': Timestamp.fromDate(updatedAt),
       'isAvailable': isAvailable,
       'views': views,
       'tags': tags,
@@ -77,13 +79,13 @@ class ProductModel {
       id: map['id'] ?? '',
       title: map['title'] ?? '',
       description: map['description'] ?? '',
-      price: (map['price'] ?? 0).toDouble(),
+      price: _parseDouble(map['price']),
       category: ProductCategory.values.firstWhere(
-        (e) => e.name == map['category'],
+            (e) => e.name == map['category'],
         orElse: () => ProductCategory.other,
       ),
       condition: ProductCondition.values.firstWhere(
-        (e) => e.name == map['condition'],
+            (e) => e.name == map['condition'],
         orElse: () => ProductCondition.good,
       ),
       imageUrls: List<String>.from(map['imageUrls'] ?? []),
@@ -91,12 +93,50 @@ class ProductModel {
       sellerName: map['sellerName'] ?? '',
       sellerPhone: map['sellerPhone'] ?? '',
       location: map['location'] ?? '',
-      createdAt: DateTime.parse(map['createdAt']),
-      updatedAt: DateTime.parse(map['updatedAt']),
+      createdAt: _parseDateTime(map['createdAt']),
+      updatedAt: _parseDateTime(map['updatedAt']),
       isAvailable: map['isAvailable'] ?? true,
       views: map['views'] ?? 0,
       tags: List<String>.from(map['tags'] ?? []),
     );
+  }
+
+  // Helper method to parse double values from various formats
+  static double _parseDouble(dynamic value) {
+    if (value == null) return 0.0;
+    if (value is double) return value;
+    if (value is int) return value.toDouble();
+    if (value is String) return double.tryParse(value) ?? 0.0;
+    return 0.0;
+  }
+
+  // Helper method to parse DateTime from Firestore Timestamp or ISO String
+  static DateTime _parseDateTime(dynamic value) {
+    if (value == null) return DateTime.now();
+
+    // If it's a Firestore Timestamp
+    if (value is Timestamp) {
+      return value.toDate();
+    }
+
+    // If it's a String (ISO format)
+    if (value is String) {
+      try {
+        return DateTime.parse(value);
+      } catch (e) {
+        print('Error parsing date string: $value, error: $e');
+        return DateTime.now();
+      }
+    }
+
+    // If it's already a DateTime
+    if (value is DateTime) {
+      return value;
+    }
+
+    // Fallback
+    print('Unknown date format: $value (${value.runtimeType})');
+    return DateTime.now();
   }
 
   ProductModel copyWith({
