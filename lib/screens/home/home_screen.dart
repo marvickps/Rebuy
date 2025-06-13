@@ -4,7 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/product_provider.dart';
 import '../../models/product_model.dart';
-// import '../product/product_detail_screen.dart';
+import '../product/product_detail_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -56,14 +56,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     },
                     selectedColor: const Color(0xFF002F34),
                     labelStyle: TextStyle(
-                      color: productProvider.selectedCategory == null 
-                          ? Colors.white 
+                      color: productProvider.selectedCategory == null
+                          ? Colors.white
                           : Colors.black87,
                     ),
                   ),
                 );
               }
-              
+
               final category = ProductCategory.values[index - 1];
               return Padding(
                 padding: const EdgeInsets.only(right: 8),
@@ -75,8 +75,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   },
                   selectedColor: const Color(0xFF002F34),
                   labelStyle: TextStyle(
-                    color: productProvider.selectedCategory == category 
-                        ? Colors.white 
+                    color: productProvider.selectedCategory == category
+                        ? Colors.white
                         : Colors.black87,
                   ),
                 ),
@@ -159,12 +159,16 @@ class _HomeScreenState extends State<HomeScreen> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
         onTap: () {
-          // Navigator.push(
-          //   context,
-          //   MaterialPageRoute(
-          //     builder: (context) => ProductDetailScreen(productId: product.id),
-          //   ),
-          // );
+          // Navigate to ProductDetailScreen with proper product data
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ProductDetailScreen(
+                productId: product.id,
+                product: product, // Pass the product for faster loading
+              ),
+            ),
+          );
         },
         borderRadius: BorderRadius.circular(12),
         child: Column(
@@ -182,25 +186,25 @@ class _HomeScreenState extends State<HomeScreen> {
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
                   child: product.imageUrls.isNotEmpty
                       ? CachedNetworkImage(
-                          imageUrl: product.imageUrls.first,
-                          fit: BoxFit.cover,
-                          placeholder: (context, url) => Container(
-                            color: Colors.grey[200],
-                            child: const Center(child: CircularProgressIndicator()),
-                          ),
-                          errorWidget: (context, url, error) => Container(
-                            color: Colors.grey[200],
-                            child: const Icon(Icons.image_not_supported, size: 50, color: Colors.grey),
-                          ),
-                        )
+                    imageUrl: product.imageUrls.first,
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) => Container(
+                      color: Colors.grey[200],
+                      child: const Center(child: CircularProgressIndicator()),
+                    ),
+                    errorWidget: (context, url, error) => Container(
+                      color: Colors.grey[200],
+                      child: const Icon(Icons.image_not_supported, size: 50, color: Colors.grey),
+                    ),
+                  )
                       : Container(
-                          color: Colors.grey[200],
-                          child: const Icon(Icons.image_not_supported, size: 50, color: Colors.grey),
-                        ),
+                    color: Colors.grey[200],
+                    child: const Icon(Icons.image_not_supported, size: 50, color: Colors.grey),
+                  ),
                 ),
               ),
             ),
-            
+
             // Product Details
             Expanded(
               flex: 2,
@@ -268,10 +272,10 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
         ),
-        
+
         // Category Filter
         _buildCategoryChips(),
-        
+
         // Product Grid
         Expanded(child: _buildProductGrid()),
       ],
@@ -294,9 +298,44 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           );
         }
-        
-        return const Center(
-          child: Text('Favorites will be loaded here'),
+
+        // TODO: Load and display favorite products
+        return Consumer<ProductProvider>(
+          builder: (context, productProvider, child) {
+            final favoriteIds = authProvider.userModel?.favorites ?? [];
+            final favoriteProducts = productProvider.products
+                .where((product) => favoriteIds.contains(product.id))
+                .toList();
+
+            if (favoriteProducts.isEmpty) {
+              return const Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.favorite_border, size: 64, color: Colors.grey),
+                    SizedBox(height: 16),
+                    Text('No favorites yet', style: TextStyle(fontSize: 18, color: Colors.grey)),
+                    Text('Start adding products to your favorites!', style: TextStyle(color: Colors.grey)),
+                  ],
+                ),
+              );
+            }
+
+            return GridView.builder(
+              padding: const EdgeInsets.all(16),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                childAspectRatio: 0.75,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+              ),
+              itemCount: favoriteProducts.length,
+              itemBuilder: (context, index) {
+                final product = favoriteProducts[index];
+                return _buildProductCard(product);
+              },
+            );
+          },
         );
       },
     );
@@ -307,7 +346,7 @@ class _HomeScreenState extends State<HomeScreen> {
       builder: (context, authProvider, child) {
         final user = authProvider.userModel;
         if (user == null) return const SizedBox();
-        
+
         return Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -344,9 +383,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ),
-              
+
               const SizedBox(height: 20),
-              
+
               // Menu Items
               ListTile(
                 leading: const Icon(Icons.add_box_outlined),
@@ -361,7 +400,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 title: const Text('Chats'),
                 trailing: const Icon(Icons.arrow_forward_ios),
                 onTap: () {
-                  Navigator.pushNamed(context, '/chat-list');
+                  // Navigator.pushNamed(context, '/chat-list');
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Chat feature coming soon!')),
+                  );
                 },
               ),
               ListTile(
@@ -370,15 +412,39 @@ class _HomeScreenState extends State<HomeScreen> {
                 trailing: const Icon(Icons.arrow_forward_ios),
                 onTap: () {
                   // Navigate to settings
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Settings coming soon!')),
+                  );
                 },
               ),
               ListTile(
                 leading: const Icon(Icons.logout, color: Colors.red),
                 title: const Text('Logout', style: TextStyle(color: Colors.red)),
                 onTap: () async {
-                  await authProvider.signOut();
-                  if (mounted) {
-                    Navigator.pushReplacementNamed(context, '/login');
+                  // Show confirmation dialog
+                  final shouldLogout = await showDialog<bool>(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text('Logout'),
+                      content: const Text('Are you sure you want to logout?'),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context, false),
+                          child: const Text('Cancel'),
+                        ),
+                        TextButton(
+                          onPressed: () => Navigator.pop(context, true),
+                          child: const Text('Logout'),
+                        ),
+                      ],
+                    ),
+                  );
+
+                  if (shouldLogout == true) {
+                    await authProvider.signOut();
+                    if (mounted) {
+                      Navigator.pushReplacementNamed(context, '/login');
+                    }
                   }
                 },
               ),
@@ -407,7 +473,9 @@ class _HomeScreenState extends State<HomeScreen> {
           IconButton(
             icon: const Icon(Icons.notifications_outlined),
             onPressed: () {
-              // Handle notifications
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Notifications coming soon!')),
+              );
             },
           ),
         ],

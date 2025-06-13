@@ -134,7 +134,6 @@ class _AddProductScreenState extends State<AddProductScreen> {
 
     bool success;
     if (widget.product == null) {
-      // Adding new product
       success = await productProvider.addProduct(
         title: _titleController.text.trim(),
         description: _descriptionController.text.trim(),
@@ -149,7 +148,6 @@ class _AddProductScreenState extends State<AddProductScreen> {
         tags: tags,
       );
     } else {
-      // Updating existing product
       final updatedProduct = widget.product!.copyWith(
         title: _titleController.text.trim(),
         description: _descriptionController.text.trim(),

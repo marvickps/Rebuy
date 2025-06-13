@@ -73,12 +73,49 @@ class MyApp extends StatelessWidget {
           ),
         ),
         home: const SplashScreen(),
+        onGenerateRoute: (settings) {
+          switch (settings.name) {
+            case '/login':
+              return MaterialPageRoute(builder: (context) => const LoginScreen());
+            case '/signup':
+              return MaterialPageRoute(builder: (context) => const SignupScreen());
+            case '/home':
+              return MaterialPageRoute(builder: (context) => const HomeScreen());
+            case '/add-product':
+              return MaterialPageRoute(builder: (context) => const AddProductScreen());
+            case '/product-detail':
+            // Handle ProductDetailScreen with arguments
+              final args = settings.arguments as Map<String, dynamic>?;
+              if (args != null && args.containsKey('productId')) {
+                return MaterialPageRoute(
+                  builder: (context) => ProductDetailScreen(
+                    productId: args['productId'] as String,
+                    product: args['product'], // Optional product object
+                  ),
+                );
+              }
+              // Fallback to home if no proper arguments
+              return MaterialPageRoute(builder: (context) => const HomeScreen());
+          // Add other routes as needed
+          // case '/chat-list':
+          //   return MaterialPageRoute(builder: (context) => const ChatListScreen());
+          // case '/chat':
+          //   return MaterialPageRoute(builder: (context) => const ChatScreen());
+          // case '/profile':
+          //   return MaterialPageRoute(builder: (context) => const ProfileScreen());
+          // case '/payment':
+          //   return MaterialPageRoute(builder: (context) => const PaymentScreen());
+            default:
+              return MaterialPageRoute(builder: (context) => const HomeScreen());
+          }
+        },
         routes: {
           '/login': (context) => const LoginScreen(),
           '/signup': (context) => const SignupScreen(),
           '/home': (context) => const HomeScreen(),
           '/add-product': (context) => const AddProductScreen(),
-          '/product-detail': (context) => ProductDetailScreen(),
+          // Remove the simple product-detail route since we're using onGenerateRoute
+          // '/product-detail': (context) => ProductDetailScreen(),
           // '/chat-list': (context) => const ChatListScreen(),
           // '/chat': (context) => const ChatScreen(),
           // '/profile': (context) => const ProfileScreen(),
