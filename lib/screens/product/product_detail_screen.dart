@@ -7,7 +7,7 @@ import '../../models/product_model.dart';
 import '../../providers/product_provider.dart';
 import '../../providers/auth_provider.dart';
 
-import '../widgets/image_carousel.dart';
+import 'widgets/image_carousel.dart';
 import '../widgets/product_card.dart';
 import 'add_product_screen.dart';
 
