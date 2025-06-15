@@ -5,6 +5,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import '../../../models/chat_model.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../providers/chat_provider.dart';
+import 'chat_screen.dart';
 
 
 class ChatListScreen extends StatefulWidget {
@@ -67,7 +68,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
                 borderRadius: BorderRadius.circular(8),
                 color: Colors.grey[200],
               ),
-              child: ClipRRadius(
+              child: ClipRRect(
                 borderRadius: BorderRadius.circular(8),
                 child: chat.productImageUrl.isNotEmpty
                     ? CachedNetworkImage(

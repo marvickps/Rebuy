@@ -13,7 +13,7 @@ import 'screens/home/home_screen.dart';
 import 'screens/auth/signup_screen.dart';
 import 'screens/product/add_product_screen.dart';
 import 'screens/product/product_detail_screen.dart';
-// import 'screens/chat/chat_list_screen.dart';
+import 'screens/chat/screen/chat_list_screen.dart';
 // import 'screens/chat/chat_screen.dart';
 // import 'screens/profile/profile_screen.dart';
 // import 'screens/payment/payment_screen.dart';
@@ -97,8 +97,8 @@ class MyApp extends StatelessWidget {
               // Fallback to home if no proper arguments
               return MaterialPageRoute(builder: (context) => const HomeScreen());
           // Add other routes as needed
-          // case '/chat-list':
-          //   return MaterialPageRoute(builder: (context) => const ChatListScreen());
+          case '/chat-list':
+            return MaterialPageRoute(builder: (context) => const ChatListScreen());
           // case '/chat':
           //   return MaterialPageRoute(builder: (context) => const ChatScreen());
           // case '/profile':
@@ -116,7 +116,7 @@ class MyApp extends StatelessWidget {
           '/add-product': (context) => const AddProductScreen(),
           // Remove the simple product-detail route since we're using onGenerateRoute
           // '/product-detail': (context) => ProductDetailScreen(),
-          // '/chat-list': (context) => const ChatListScreen(),
+          '/chat-list': (context) => const ChatListScreen(),
           // '/chat': (context) => const ChatScreen(),
           // '/profile': (context) => const ProfileScreen(),
           // '/payment': (context) => const PaymentScreen(),
