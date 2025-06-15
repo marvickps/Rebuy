@@ -4,12 +4,16 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../models/product_model.dart';
+import '../../models/user_model.dart';
 import '../../providers/product_provider.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/chat_provider.dart';
+import '../../providers/user_provider.dart';
 
 import 'widgets/image_carousel.dart';
 import 'widgets/product_card.dart';
 import 'add_product_screen.dart';
+import '../chat/screen/chat_screen.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final String productId;
@@ -170,6 +174,98 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     }
   }
 
+  Future<void> _startChat() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final chatProvider = Provider.of<ChatProvider>(context, listen: false);
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+
+    // Check if user is logged in
+    if (authProvider.user == null || authProvider.userModel == null) {
+      Navigator.pushNamed(context, '/login');
+      return;
+    }
+
+    if (_product == null) return;
+
+    // Check if user is trying to chat with themselves
+    if (authProvider.user!.uid == _product!.sellerId) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('You cannot chat with yourself'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
+    try {
+      // Show loading indicator
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+
+      // Get seller user model
+      UserModel? sellerUser = await userProvider.getUser(_product!.sellerId);
+
+      if (sellerUser == null) {
+        Navigator.pop(context); // Close loading dialog
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Seller information not found'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+
+      // Create or get existing chat
+      final chatId = await chatProvider.createOrGetChat(
+        product: _product!,
+        buyer: authProvider.userModel!,
+        seller: sellerUser,
+      );
+
+      Navigator.pop(context); // Close loading dialog
+
+      if (chatId != null) {
+        // Navigate to chat screen
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ChatScreen(
+              chatId: chatId,
+              productTitle: _product!.title,
+              otherUserName: sellerUser.name,
+              productImageUrl: _product!.imageUrls.isNotEmpty
+                  ? _product!.imageUrls.first
+                  : null,
+              productPrice: _product!.price,
+            ),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to start chat: ${chatProvider.errorMessage}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      Navigator.pop(context); // Close loading dialog if still open
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to start chat: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
   Future<void> _shareProduct() async {
     if (_product != null) {
       final String shareText = '''
@@ -294,6 +390,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               ),
             ),
             ListTile(
+              leading: const Icon(LucideIcons.messageCircle, color: Colors.orange),
+              title: const Text('Chat'),
+              onTap: () {
+                Navigator.pop(context);
+                _startChat();
+              },
+            ),
+            ListTile(
               leading: const Icon(LucideIcons.phone, color: Colors.green),
               title: const Text('Call'),
               onTap: () {
@@ -309,15 +413,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 _sendSMS();
               },
             ),
-            // TODO: Add Chat option when chat feature is implemented
-            // ListTile(
-            //   leading: const Icon(LucideIcons.messageCircle, color: Colors.orange),
-            //   title: const Text('Chat'),
-            //   onTap: () {
-            //     Navigator.pop(context);
-            //     // Navigate to chat screen
-            //   },
-            // ),
           ],
         ),
       ),
@@ -688,9 +783,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             const SizedBox(width: 12),
             Expanded(
               child: ElevatedButton.icon(
-                onPressed: _showContactOptions,
-                icon: const Icon(LucideIcons.messageSquare),
-                label: const Text('Contact'),
+                onPressed: _startChat,
+                icon: const Icon(LucideIcons.messageCircle),
+                label: const Text('Chat'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF002F34),
                   padding: const EdgeInsets.symmetric(vertical: 12),
