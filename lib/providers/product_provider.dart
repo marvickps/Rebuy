@@ -5,6 +5,36 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:uuid/uuid.dart';
 import '../models/product_model.dart';
 
+// Extension for ProductCategory display names
+extension ProductCategoryExtension on ProductCategory {
+  String get displayName {
+    switch (this) {
+      case ProductCategory.electronics:
+        return 'Electronics';
+      case ProductCategory.vehicles:
+        return 'Vehicles';
+      case ProductCategory.properties:
+        return 'Properties';
+      case ProductCategory.fashion:
+        return 'Fashion';
+      case ProductCategory.hobbies:
+        return 'Hobbies';
+      case ProductCategory.furniture:
+        return 'Furniture';
+      case ProductCategory.books:
+        return 'Books';
+      case ProductCategory.sports:
+        return 'Sports';
+      case ProductCategory.jobs:
+        return 'Jobs';
+      case ProductCategory.services:
+        return 'Services';
+      case ProductCategory.other:
+        return 'Other';
+    }
+  }
+}
+
 class ProductProvider extends ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
@@ -18,14 +48,30 @@ class ProductProvider extends ChangeNotifier {
   String _errorMessage = '';
   ProductCategory? _selectedCategory;
   String _searchQuery = '';
+  String? _selectedLocation;
 
-  List<ProductModel> get products => _filteredProducts.isNotEmpty ? _filteredProducts : _products;
+  // Getters - FIXED: Always return filtered products when filters are active
+  List<ProductModel> get products {
+    if (hasActiveFilters) {
+      return _filteredProducts;
+    }
+    return _products;
+  }
+
   List<ProductModel> get myProducts => _myProducts;
   List<ProductModel> get favoriteProducts => _favoriteProducts;
   bool get isLoading => _isLoading;
   String get errorMessage => _errorMessage;
   ProductCategory? get selectedCategory => _selectedCategory;
   String get searchQuery => _searchQuery;
+  String? get selectedLocation => _selectedLocation;
+
+  // Check if any filters are active
+  bool get hasActiveFilters {
+    return _searchQuery.isNotEmpty ||
+        _selectedCategory != null ||
+        (_selectedLocation != null && _selectedLocation!.isNotEmpty);
+  }
 
   Future<void> loadProducts() async {
     try {
@@ -340,8 +386,9 @@ class ProductProvider extends ChangeNotifier {
     }
   }
 
+  // Filter methods
   void searchProducts(String query) {
-    _searchQuery = query.toLowerCase();
+    _searchQuery = query.toLowerCase().trim();
     _applyFilters();
   }
 
@@ -350,31 +397,61 @@ class ProductProvider extends ChangeNotifier {
     _applyFilters();
   }
 
-  void clearFilters() {
-    _selectedCategory = null;
-    _searchQuery = '';
+  void filterByLocation(String location) {
+    _selectedLocation = location.trim().isEmpty ? null : location.trim().toLowerCase();
     _applyFilters();
   }
 
+  void clearFilters() {
+    _selectedCategory = null;
+    _searchQuery = '';
+    _selectedLocation = null;
+    _filteredProducts = [];
+    notifyListeners();
+  }
+
+  // FIXED: Apply filters method - properly handle empty results
   void _applyFilters() {
+    print('Applying filters...');
+    print('Selected category: $_selectedCategory');
+    print('Search query: "$_searchQuery"');
+    print('Selected location: "$_selectedLocation"');
+    print('Total products: ${_products.length}');
+
+    // Start with all products
     List<ProductModel> filtered = List.from(_products);
 
-    // Apply category filter
+    // Apply category filter first
     if (_selectedCategory != null) {
       filtered = filtered.where((p) => p.category == _selectedCategory).toList();
+      print('After category filter: ${filtered.length} products');
     }
 
     // Apply search filter
     if (_searchQuery.isNotEmpty) {
       filtered = filtered.where((p) {
-        return p.title.toLowerCase().contains(_searchQuery) ||
-            p.description.toLowerCase().contains(_searchQuery) ||
-            p.tags.any((tag) => tag.toLowerCase().contains(_searchQuery)) ||
-            p.location.toLowerCase().contains(_searchQuery);
+        final titleMatch = p.title.toLowerCase().contains(_searchQuery);
+        final descriptionMatch = p.description.toLowerCase().contains(_searchQuery);
+        final tagsMatch = p.tags.any((tag) => tag.toLowerCase().contains(_searchQuery));
+        final locationMatch = p.location.toLowerCase().contains(_searchQuery);
+
+        return titleMatch || descriptionMatch || tagsMatch || locationMatch;
       }).toList();
+      print('After search filter: ${filtered.length} products');
     }
 
+    // Apply location filter
+    if (_selectedLocation != null && _selectedLocation!.isNotEmpty) {
+      filtered = filtered.where((p) {
+        return p.location.toLowerCase().contains(_selectedLocation!);
+      }).toList();
+      print('After location filter: ${filtered.length} products');
+    }
+
+    // IMPORTANT: Always set filtered products, even if empty
     _filteredProducts = filtered;
+    print('Final filtered products: ${_filteredProducts.length}');
+
     notifyListeners();
   }
 
@@ -420,6 +497,7 @@ class ProductProvider extends ChangeNotifier {
     }
   }
 
+  // Helper methods
   void _setLoading(bool loading) {
     _isLoading = loading;
     notifyListeners();
