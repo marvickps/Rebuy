@@ -83,7 +83,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     const SizedBox(height: 8),
                     const Text(
-                      'Sign in to continue to OLX Clone',
+                      'Sign in to continue to Rebuy',
                       style: TextStyle(
                         fontSize: 16,
                         color: Colors.grey,

@@ -61,7 +61,7 @@ class _SplashScreenState extends State<SplashScreen> {
             
             // Title
             const Text(
-              'OLX Clone',
+              'Rebuy',
               style: TextStyle(
                 fontSize: 32,
                 fontWeight: FontWeight.bold,
