@@ -1,32 +1,26 @@
 # Instruction
 
-### *Core Features:*
+### *Core Features :*
 
-- User authentication (sign up, login, logout)
-- Product listing and posting
+- User authentication (sign up, login, logout)  ✅
+- Product listing and posting ✅
 - Basic product browsing/search
-- User profiles
-- Firebase backend integration
+- User profiles ✅
+- Firebase backend integration ✅
 
-### *Advanced Features:*
+### *Advanced Features  :*
 
-- Real-time chat between buyers/sellers
-- Image upload for products
-- Categories and filtering
-- Favorites/wishlist functionality
-- mockup payment page.
+- Real-time chat between buyers/sellers ✅
+- Image upload for products ✅
+- Categories and filtering (Needed improvement)
+- Favorites/wishlist functionality (not showing in the page)
+- **Shipping Options for Seller**
+    - Choose between courier or speed post
+    - Could be a dropdown or input field when listing
+- **Order Tracking Info from Seller - Tracking number, Shipping method info**
+- **Rating System -** After a transaction, users should be able to Rate the other party
+- mockup payment page. (not done)
 
-### *UI/UX Polish:*
-
-- Modern, responsive design
-- Smooth navigation
-- Loading states and error handling
-
-### *Testing & Deployment:*
-
-- Bug fixes and testing
-- Firebase configuration
-- APK generation
 
 ## *Your Role as Your Development Partner:*
 
