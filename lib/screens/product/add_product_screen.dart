@@ -596,10 +596,6 @@ class _AddProductScreenState extends State<AddProductScreen> {
         return 'Books';
       case ProductCategory.sports:
         return 'Sports';
-      case ProductCategory.jobs:
-        return 'Jobs';
-      case ProductCategory.services:
-        return 'Services';
       case ProductCategory.other:
         return 'Other';
     }

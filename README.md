@@ -4,7 +4,7 @@
 
 - User authentication (sign up, login, logout)  ✅
 - Product listing and posting ✅
-- Basic product browsing/search
+- Basic product browsing/search ✅
 - User profiles ✅
 - Firebase backend integration ✅
 
@@ -12,15 +12,14 @@
 
 - Real-time chat between buyers/sellers ✅
 - Image upload for products ✅
-- Categories and filtering (Needed improvement)
+- Categories and filtering  ✅
 - Favorites/wishlist functionality (not showing in the page)
 - **Shipping Options for Seller**
-    - Choose between courier or speed post
-    - Could be a dropdown or input field when listing
+  - Choose between courier or speed post
+  - Could be a dropdown or input field when listing
 - **Order Tracking Info from Seller - Tracking number, Shipping method info**
 - **Rating System -** After a transaction, users should be able to Rate the other party
-- mockup payment page. (not done)
-
+- mockup payment page. 
 
 ## *Your Role as Your Development Partner:*
 

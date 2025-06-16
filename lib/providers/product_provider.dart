@@ -25,10 +25,7 @@ extension ProductCategoryExtension on ProductCategory {
         return 'Books';
       case ProductCategory.sports:
         return 'Sports';
-      case ProductCategory.jobs:
-        return 'Jobs';
-      case ProductCategory.services:
-        return 'Services';
+
       case ProductCategory.other:
         return 'Other';
     }
