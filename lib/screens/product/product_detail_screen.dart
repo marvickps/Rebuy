@@ -212,7 +212,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       UserModel? sellerUser = await userProvider.getUser(_product!.sellerId);
 
       if (sellerUser == null) {
-        Navigator.pop(context); // Close loading dialog
+        Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Seller information not found'),
@@ -405,14 +405,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 _makePhoneCall();
               },
             ),
-            ListTile(
-              leading: const Icon(LucideIcons.messageSquare, color: Colors.blue),
-              title: const Text('SMS'),
-              onTap: () {
-                Navigator.pop(context);
-                _sendSMS();
-              },
-            ),
+
           ],
         ),
       ),
@@ -771,11 +764,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         child: Row(
           children: [
             Expanded(
-              child: OutlinedButton.icon(
-                onPressed: _makePhoneCall,
-                icon: const Icon(LucideIcons.phone),
-                label: const Text('Call'),
-                style: OutlinedButton.styleFrom(
+              child: ElevatedButton.icon(
+                onPressed:() {},
+                icon: const Icon(LucideIcons.banknote,
+                color: Color(0xFF002F34)),
+                label: Text('Make an Offer', style: TextStyle(color: Color(0xFF002F34))
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFFFFFFF),
                   padding: const EdgeInsets.symmetric(vertical: 12),
                 ),
               ),

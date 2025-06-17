@@ -14,6 +14,9 @@
 - Image upload for products ✅
 - Categories and filtering  ✅
 - Favorites/wishlist functionality ✅
+- Buyer should able counter the offer (it would be different from chat) 
+  - if seller agree he can generate a qr to pay that amount to buyer.
+  - or else seller can give counter offer again and buyer can accept and they can procide further.
 - **Shipping Options for Seller**
   - Choose between courier or speed post
   - Could be a dropdown or input field when listing
