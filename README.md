@@ -13,7 +13,7 @@
 - Real-time chat between buyers/sellers ✅
 - Image upload for products ✅
 - Categories and filtering  ✅
-- Favorites/wishlist functionality (not showing in the page)
+- Favorites/wishlist functionality ✅
 - **Shipping Options for Seller**
   - Choose between courier or speed post
   - Could be a dropdown or input field when listing
