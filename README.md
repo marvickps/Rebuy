@@ -1,5 +1,49 @@
 # Instruction
 
+Files that been done until now:
+lib/
+├── models/
+│   ├── chat_model.dart
+│   ├── order_model.dart
+│   ├── product_model.dart
+│   ├── rating_model.dart
+│   └── user_model.dart
+│
+├── providers/
+│   ├── auth_provider.dart
+│   ├── chat_provider.dart
+│   ├── favorite_provider.dart
+│   ├── product_provider.dart
+│   └── user_provider.dart
+│
+├── screens/
+│   ├── auth/
+│   │   ├── login_screen.dart
+│   │   └── signup_screen.dart
+│   │
+│   ├── chat/
+│   │   └── screen/
+│   │       ├── chat_list_screen.dart
+│   │       └── chat_screen.dart
+│   │
+│   ├── home/
+│   │   ├── components/
+│   │   │   ├── chats_tab.dart
+│   │   │   ├── favorites_tab.dart
+│   │   │   ├── home_tab.dart
+│   │   │   ├── profile_tab.dart
+│   │   │   └── sell_tab.dart
+│   │   └── home_screen.dart
+│   │
+│   └── product/
+│       └── widgets/
+│           ├── add_product_screen.dart
+│           └── product_detail_screen.dart
+│
+├── firebase_options.dart
+└── main.dart
+
+
 ### *Core Features :*
 
 - User authentication (sign up, login, logout)  ✅
@@ -11,7 +55,7 @@
 ### *Advanced Features  :*
 
 - Real-time chat between buyers/sellers ✅
-- Image upload for products ✅
+- Image upload for prod ucts ✅
 - Categories and filtering  ✅
 - Favorites/wishlist functionality ✅
 - Buyer should able counter the offer (it would be different from chat) 
