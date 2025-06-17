@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/product_provider.dart';
+import '../../providers/favorite_provider.dart';
 import 'components/home_tab.dart';
 import 'components/favorites_tab.dart';
 import 'components/sell_tab.dart';
@@ -22,7 +23,17 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<ProductProvider>(context, listen: false).loadProducts();
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final productProvider = Provider.of<ProductProvider>(context, listen: false);
+      final favoritesProvider = Provider.of<FavoritesProvider>(context, listen: false);
+
+      // Load products
+      productProvider.loadProducts();
+
+      // Initialize favorites if user is logged in
+      if (authProvider.user != null) {
+        favoritesProvider.initializeFavorites(authProvider.user!.uid);
+      }
     });
   }
 
