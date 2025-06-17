@@ -10,6 +10,10 @@ import '../../providers/auth_provider.dart';
 import '../../providers/chat_provider.dart';
 import '../../providers/user_provider.dart';
 
+import '../../providers/offer_provider.dart';
+import './offer_screen.dart';
+import './offer_management.dart';
+
 import 'widgets/image_carousel.dart';
 import 'widgets/product_card.dart';
 import 'add_product_screen.dart';
@@ -35,6 +39,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   bool _isLoading = true;
   bool _isFavorite = false;
 
+  bool _hasExistingOffer = false;
+  double? _existingOfferAmount;
+
   @override
   void initState() {
     super.initState();
@@ -44,7 +51,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   Future<void> _loadProductDetails() async {
     final productProvider = Provider.of<ProductProvider>(context, listen: false);
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-
+    final offerProvider = Provider.of<OfferProvider>(context, listen: false);
     setState(() {
       _isLoading = true;
     });
@@ -68,6 +75,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           });
         }
 
+        await _checkExistingOffer(authProvider.user!.uid, product.id);
         // Load related products
         final relatedProducts = await productProvider.getRelatedProducts(
           product.id,
@@ -93,6 +101,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       });
     }
   }
+
 
   Future<void> _toggleFavorite() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
@@ -149,31 +158,139 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       }
     }
   }
+  Future<void> _checkExistingOffer(String userId, String productId) async {
+    final offerProvider = Provider.of<OfferProvider>(context, listen: false);
 
-  Future<void> _sendSMS() async {
-    if (_product?.sellerPhone != null && _product!.sellerPhone.isNotEmpty) {
-      final Uri smsUri = Uri(
-        scheme: 'sms',
-        path: _product!.sellerPhone,
-        query: 'body=Hi, I\'m interested in your ${_product!.title}',
+    try {
+      // Load user's sent offers
+      await offerProvider.loadUserOffers(userId);
+
+      // Check if there's an existing offer for this product
+      final existingOffer = offerProvider.sentOffers.firstWhere(
+            (offer) => offer.productId == productId &&
+            (offer.status == 'pending' || offer.status == 'counter'),
+        orElse: () => throw StateError('No offer found'),
       );
-      try {
-        if (await canLaunchUrl(smsUri)) {
-          await launchUrl(smsUri);
-        } else {
-          throw 'Could not launch SMS';
-        }
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Cannot send SMS: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
+
+      setState(() {
+        _hasExistingOffer = true;
+        _existingOfferAmount = existingOffer.offerAmount;
+      });
+    } catch (e) {
+      // No existing offer found, which is fine
+      setState(() {
+        _hasExistingOffer = false;
+        _existingOfferAmount = null;
+      });
+    }
+  }
+
+  Future<void> _navigateToMakeOffer() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
+    // Check if user is logged in
+    if (authProvider.user == null) {
+      Navigator.pushNamed(context, '/login');
+      return;
+    }
+
+    if (_product == null) return;
+
+    // Check if user is trying to make offer on their own product
+    if (authProvider.user!.uid == _product!.sellerId) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('You cannot make an offer on your own product'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
+    // Navigate to make offer screen
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => MakeOfferScreen(product: _product!),
+      ),
+    );
+
+    // Refresh offer status if an offer was made
+    if (result == true) {
+      await _checkExistingOffer(authProvider.user!.uid, _product!.id);
+    }
+  }
+
+  Future<void> _navigateToOfferManagement() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const OffersScreen(),
+      ),
+    );
+
+    // Refresh offer status when returning
+    if (result == true) {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      if (authProvider.user != null && _product != null) {
+        await _checkExistingOffer(authProvider.user!.uid, _product!.id);
       }
     }
   }
 
+  Future<void> _showOfferOptions() async {
+    if (_hasExistingOffer) {
+      // Show existing offer options
+      showModalBottomSheet(
+        context: context,
+        builder: (context) => SafeArea(
+          child: Wrap(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  children: [
+                    const Text(
+                      'Your Offer',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'You have an existing offer of ₹${_existingOfferAmount?.toStringAsFixed(0)}',
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                  ],
+                ),
+              ),
+              ListTile(
+                leading: const Icon(LucideIcons.eye, color: Colors.blue),
+                title: const Text('View All My Offers'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _navigateToOfferManagement();
+                },
+              ),
+              ListTile(
+                leading: const Icon(LucideIcons.edit, color: Colors.orange),
+                title: const Text('Make New Offer'),
+                subtitle: const Text('This will replace your existing offer'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _navigateToMakeOffer();
+                },
+              ),
+            ],
+          ),
+        ),
+      );
+    } else {
+      // Directly navigate to make offer
+      _navigateToMakeOffer();
+    }
+  }
   Future<void> _startChat() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final chatProvider = Provider.of<ChatProvider>(context, listen: false);
@@ -310,6 +427,15 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     builder: (context) => AddProductScreen(product: _product),
                   ),
                 ).then((_) => _loadProductDetails());
+              },
+
+            ),
+            ListTile(
+              leading: const Icon(LucideIcons.banknote, color: Colors.blue),
+              title: const Text('View Offers'),
+              onTap: () {
+                Navigator.pop(context);
+                _navigateToOfferManagement();
               },
             ),
             ListTile(
@@ -526,7 +652,36 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     ],
                   ),
                   const SizedBox(height: 16),
-
+// Existing offer notification
+                  if (_hasExistingOffer && !isOwner)
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 16),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.blue[50],
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.blue[200]!),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(LucideIcons.banknote, color: Colors.blue[700], size: 20),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              'You have an offer of ₹${_existingOfferAmount?.toStringAsFixed(0)} on this product',
+                              style: TextStyle(
+                                color: Colors.blue[700],
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: _navigateToOfferManagement,
+                            child: const Text('View'),
+                          ),
+                        ],
+                      ),
+                    ),
                   // Category and Condition
                   Row(
                     children: [
@@ -765,7 +920,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           children: [
             Expanded(
               child: ElevatedButton.icon(
-                onPressed:() {},
+                onPressed:() {
+
+                },
                 icon: const Icon(LucideIcons.banknote,
                 color: Color(0xFF002F34)),
                 label: Text('Make an Offer', style: TextStyle(color: Color(0xFF002F34))
