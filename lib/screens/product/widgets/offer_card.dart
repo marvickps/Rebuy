@@ -280,6 +280,7 @@ class OfferCard extends StatelessWidget {
                             icon: const Icon(LucideIcons.arrowLeftRight, size: 16),
                             label: const Text('Counter'),
                             style: OutlinedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 12),
                               foregroundColor: Colors.orange,
                               side: const BorderSide(color: Colors.orange),
                             ),
@@ -289,14 +290,18 @@ class OfferCard extends StatelessWidget {
                         Expanded(
                           child: ElevatedButton.icon(
                             onPressed: () => onAction('accept'),
-                            icon: const Icon(LucideIcons.check, size: 16),
+                            icon: const Icon(LucideIcons.check, size: 12),
                             label: const Text('Accept'),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.green,
                               foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 12), // Adjust here
+                              textStyle: const TextStyle(fontSize: 14), // Optional: tweak text size
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap, // Optional: tighter height
                             ),
                           ),
                         ),
+
                       ],
                     ),
                   ),

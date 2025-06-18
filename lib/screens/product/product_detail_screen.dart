@@ -102,43 +102,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     }
   }
 
-
-  Future<void> _toggleFavorite() async {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-
-    if (authProvider.user == null) {
-      Navigator.pushNamed(context, '/login');
-      return;
-    }
-
-    if (_product == null) return;
-
-    try {
-      final success = await authProvider.toggleFavorite(_product!.id);
-      if (success) {
-        setState(() {
-          _isFavorite = !_isFavorite;
-        });
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(_isFavorite
-                ? 'Added to favorites'
-                : 'Removed from favorites'),
-            duration: const Duration(seconds: 1),
-          ),
-        );
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Failed to update favorites: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
-  }
-
   Future<void> _makePhoneCall() async {
     if (_product?.sellerPhone != null && _product!.sellerPhone.isNotEmpty) {
       final Uri phoneUri = Uri(scheme: 'tel', path: _product!.sellerPhone);
@@ -596,13 +559,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               ),
             ),
             actions: [
-              IconButton(
-                onPressed: _toggleFavorite,
-                icon: Icon(
-                  _isFavorite ? LucideIcons.heart : LucideIcons.heart,
-                  color: _isFavorite ? Colors.red : Colors.white,
-                ),
-              ),
+
               IconButton(
                 onPressed: _shareProduct,
                 icon: const Icon(LucideIcons.share),
