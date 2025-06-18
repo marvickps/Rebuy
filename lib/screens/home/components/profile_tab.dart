@@ -55,10 +55,10 @@ class ProfileTab extends StatelessWidget {
               // Menu Items
               ListTile(
                 leading: const Icon(Icons.add_box_outlined),
-                title: const Text('My Ads'),
+                title: const Text('My Listing'),
                 trailing: const Icon(Icons.arrow_forward_ios),
                 onTap: () {
-                  // Navigate to my ads
+                  // Navigate to my Listing
                 },
               ),
               ListTile(
