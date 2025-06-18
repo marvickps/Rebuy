@@ -16,13 +16,16 @@ class OffersScreen extends StatefulWidget {
 
 class _OffersScreenState extends State<OffersScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    _loadOffers();
+
+    // Load offers when screen initializes
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadOffers();
+    });
   }
 
   @override
@@ -35,16 +38,17 @@ class _OffersScreenState extends State<OffersScreen> with SingleTickerProviderSt
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final offerProvider = Provider.of<OfferProvider>(context, listen: false);
 
-    if (authProvider.user != null) {
-      setState(() {
-        _isLoading = true;
-      });
-
+    if (authProvider.user?.uid != null) {
+      print('Loading offers for user: ${authProvider.user!.uid}'); // Debug log
       await offerProvider.loadUserOffers(authProvider.user!.uid);
-
-      setState(() {
-        _isLoading = false;
-      });
+    } else {
+      print('No authenticated user found'); // Debug log
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please login to view your offers'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
@@ -79,9 +83,7 @@ class _OffersScreenState extends State<OffersScreen> with SingleTickerProviderSt
         break;
     }
 
-    if (success) {
-      _refreshOffers();
-    } else if (offerProvider.errorMessage != null) {
+    if (!success && offerProvider.errorMessage != null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(offerProvider.errorMessage!),
@@ -164,13 +166,16 @@ class _OffersScreenState extends State<OffersScreen> with SingleTickerProviderSt
             Tab(text: 'Received Offers'),
           ],
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(LucideIcons.refreshCw),
+            onPressed: _refreshOffers,
+            tooltip: 'Refresh Offers',
+          ),
+        ],
       ),
       body: Consumer<OfferProvider>(
         builder: (context, offerProvider, child) {
-          if (_isLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
           return TabBarView(
             controller: _tabController,
             children: [
@@ -180,6 +185,7 @@ class _OffersScreenState extends State<OffersScreen> with SingleTickerProviderSt
                 emptyMessage: 'You haven\'t made any offers yet',
                 emptyIcon: LucideIcons.send,
                 isSentOffers: true,
+                isLoading: offerProvider.isLoading,
               ),
 
               // Received Offers Tab
@@ -188,6 +194,7 @@ class _OffersScreenState extends State<OffersScreen> with SingleTickerProviderSt
                 emptyMessage: 'No offers received yet',
                 emptyIcon: LucideIcons.inbox,
                 isSentOffers: false,
+                isLoading: offerProvider.isLoading,
               ),
             ],
           );
@@ -201,26 +208,55 @@ class _OffersScreenState extends State<OffersScreen> with SingleTickerProviderSt
     required String emptyMessage,
     required IconData emptyIcon,
     required bool isSentOffers,
+    required bool isLoading,
   }) {
-    if (offers.isEmpty) {
-      return Center(
+    if (isLoading) {
+      return const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(emptyIcon, size: 64, color: Colors.grey),
-            const SizedBox(height: 16),
-            Text(
-              emptyMessage,
-              style: const TextStyle(fontSize: 18, color: Colors.grey),
-            ),
-            if (isSentOffers) ...[
-              const SizedBox(height: 8),
-              const Text(
-                'Browse products and make offers to get started',
-                style: TextStyle(fontSize: 14, color: Colors.grey),
-              ),
-            ],
+            CircularProgressIndicator(),
+            SizedBox(height: 16),
+            Text('Loading offers...'),
           ],
+        ),
+      );
+    }
+
+    if (offers.isEmpty) {
+      return RefreshIndicator(
+        onRefresh: _refreshOffers,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Container(
+            height: MediaQuery.of(context).size.height * 0.6,
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(emptyIcon, size: 64, color: Colors.grey),
+                  const SizedBox(height: 16),
+                  Text(
+                    emptyMessage,
+                    style: const TextStyle(fontSize: 18, color: Colors.grey),
+                  ),
+                  if (isSentOffers) ...[
+                    const SizedBox(height: 8),
+                    const Text(
+                      'Browse products and make offers to get started',
+                      style: TextStyle(fontSize: 14, color: Colors.grey),
+                    ),
+                  ],
+                  const SizedBox(height: 16),
+                  ElevatedButton.icon(
+                    onPressed: _refreshOffers,
+                    icon: const Icon(LucideIcons.refreshCw),
+                    label: const Text('Refresh'),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
       );
     }
@@ -232,10 +268,13 @@ class _OffersScreenState extends State<OffersScreen> with SingleTickerProviderSt
         itemCount: offers.length,
         itemBuilder: (context, index) {
           final offer = offers[index];
-          return OfferCard(
-            offer: offer,
-            isSentOffer: isSentOffers,
-            onAction: (action) => _handleOfferAction(offer, action),
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: OfferCard(
+              offer: offer,
+              isSentOffer: isSentOffers,
+              onAction: (action) => _handleOfferAction(offer, action),
+            ),
           );
         },
       ),

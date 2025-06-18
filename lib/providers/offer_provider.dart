@@ -92,7 +92,7 @@ class OfferProvider with ChangeNotifier {
       });
 
       // Update local data
-      await _loadUserOffers();
+      _updateLocalOfferStatus(offerId, OfferStatus.accepted);
       return true;
     } catch (e) {
       _setError('Failed to accept offer: $e');
@@ -115,7 +115,7 @@ class OfferProvider with ChangeNotifier {
       });
 
       // Update local data
-      await _loadUserOffers();
+      _updateLocalOfferStatus(offerId, OfferStatus.rejected, message: reason);
       return true;
     } catch (e) {
       _setError('Failed to reject offer: $e');
@@ -189,7 +189,10 @@ class OfferProvider with ChangeNotifier {
       });
 
       // Update local data
-      await _loadUserOffers();
+      _updateLocalOfferStatus(originalOfferId, OfferStatus.countered);
+      _sentOffers.add(counterOffer);
+      notifyListeners();
+
       return counterOfferId;
     } catch (e) {
       _setError('Failed to create counter offer: $e');
@@ -205,6 +208,8 @@ class OfferProvider with ChangeNotifier {
       _setLoading(true);
       _clearError();
 
+      print('Loading offers for user: $userId'); // Debug log
+
       // Load sent offers (where user is buyer)
       final sentQuery = await _firestore
           .collection('offers')
@@ -212,9 +217,19 @@ class OfferProvider with ChangeNotifier {
           .orderBy('createdAt', descending: true)
           .get();
 
+      print('Found ${sentQuery.docs.length} sent offers'); // Debug log
+
       _sentOffers = sentQuery.docs
-          .map((doc) => OfferModel.fromMap(doc.data()))
-          .where((offer) => !offer.isExpired)
+          .map((doc) {
+        try {
+          return OfferModel.fromMap(doc.data());
+        } catch (e) {
+          print('Error parsing sent offer: $e');
+          return null;
+        }
+      })
+          .where((offer) => offer != null)
+          .cast<OfferModel>()
           .toList();
 
       // Load received offers (where user is seller)
@@ -224,13 +239,25 @@ class OfferProvider with ChangeNotifier {
           .orderBy('createdAt', descending: true)
           .get();
 
+      print('Found ${receivedQuery.docs.length} received offers'); // Debug log
+
       _receivedOffers = receivedQuery.docs
-          .map((doc) => OfferModel.fromMap(doc.data()))
-          .where((offer) => !offer.isExpired)
+          .map((doc) {
+        try {
+          return OfferModel.fromMap(doc.data());
+        } catch (e) {
+          print('Error parsing received offer: $e');
+          return null;
+        }
+      })
+          .where((offer) => offer != null)
+          .cast<OfferModel>()
           .toList();
 
+      print('Loaded ${_sentOffers.length} sent offers and ${_receivedOffers.length} received offers'); // Debug log
       notifyListeners();
     } catch (e) {
+      print('Error loading offers: $e');
       _setError('Failed to load offers: $e');
     } finally {
       _setLoading(false);
@@ -296,7 +323,6 @@ class OfferProvider with ChangeNotifier {
         .map((snapshot) {
       return snapshot.docs
           .map((doc) => OfferModel.fromMap(doc.data()))
-          .where((offer) => !offer.isExpired)
           .toList();
     });
   }
@@ -341,9 +367,25 @@ class OfferProvider with ChangeNotifier {
   }
 
   // Private helper methods
-  Future<void> _loadUserOffers() async {
-    // This will be called after operations to refresh the data
-    // Implementation depends on how you want to handle user state
+  void _updateLocalOfferStatus(String offerId, OfferStatus status, {String? message}) {
+    // Update in sent offers
+    final sentIndex = _sentOffers.indexWhere((offer) => offer.id == offerId);
+    if (sentIndex != -1) {
+      _sentOffers[sentIndex] = _sentOffers[sentIndex].copyWith(
+        status: status,
+        message: message,
+      );
+    }
+
+    // Update in received offers
+    final receivedIndex = _receivedOffers.indexWhere((offer) => offer.id == offerId);
+    if (receivedIndex != -1) {
+      _receivedOffers[receivedIndex] = _receivedOffers[receivedIndex].copyWith(
+        status: status,
+        message: message,
+      );
+    }
+
     notifyListeners();
   }
 
