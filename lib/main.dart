@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rebuy/providers/favorite_provider.dart';
 import 'package:rebuy/providers/offer_provider.dart';
+import 'package:rebuy/screens/product/offer_management.dart';
 
 import 'providers/auth_provider.dart';
 import 'providers/product_provider.dart';
@@ -118,6 +119,7 @@ class MyApp extends StatelessWidget {
           '/signup': (context) => const SignupScreen(),
           '/home': (context) => const HomeScreen(),
           '/add-product': (context) => const AddProductScreen(),
+          '/offers': (context) => const OffersScreen(),
           // Remove the simple product-detail route since we're using onGenerateRoute
           // '/product-detail': (context) => ProductDetailScreen(),
           '/chat-list': (context) => const ChatListScreen(),

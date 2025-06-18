@@ -62,6 +62,14 @@ class ProfileTab extends StatelessWidget {
                 },
               ),
               ListTile(
+                leading: const Icon(Icons.local_offer_outlined),
+                title: const Text('My Offers'),
+                trailing: const Icon(Icons.arrow_forward_ios),
+                onTap: () {
+                  Navigator.pushNamed(context, '/offers');
+                },
+              ),
+              ListTile(
                 leading: const Icon(Icons.chat_bubble_outline),
                 title: const Text('Chats'),
                 trailing: const Icon(Icons.arrow_forward_ios),
