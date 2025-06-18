@@ -54,6 +54,7 @@ dependencies:
   url_launcher: ^6.2.2
   share_plus:
   photo_view:
+  qr_flutter:
   
   # Icons
   lucide_icons: 
