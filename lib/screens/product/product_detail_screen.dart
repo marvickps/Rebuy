@@ -921,6 +921,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             Expanded(
               child: ElevatedButton.icon(
                 onPressed:() {
+                  _navigateToMakeOffer();
 
                 },
                 icon: const Icon(LucideIcons.banknote,
