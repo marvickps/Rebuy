@@ -58,7 +58,7 @@ class ProfileTab extends StatelessWidget {
                 title: const Text('My Listing'),
                 trailing: const Icon(Icons.arrow_forward_ios),
                 onTap: () {
-                  // Navigate to my Listing
+                  Navigator.pushNamed(context, '/my_product');
                 },
               ),
               ListTile(
