@@ -43,7 +43,7 @@ class OfferCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        isSentOffer ? 'Offer Sent' : 'Offer Received',
+                        _getOfferTypeText(),
                         style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
@@ -68,7 +68,7 @@ class OfferCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      'Counter',
+                      'Counter Offer',
                       style: TextStyle(
                         fontSize: 10,
                         color: Colors.orange[800],
@@ -128,7 +128,7 @@ class OfferCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        isSentOffer ? 'Seller: ${offer.sellerName}' : 'Buyer: ${offer.buyerName}',
+                        _getParticipantText(),
                         style: TextStyle(
                           fontSize: 14,
                           color: Colors.grey[600],
@@ -256,86 +256,18 @@ class OfferCard extends StatelessWidget {
                   ],
                 ),
 
-                // Action Buttons
-                if (offer.status == OfferStatus.pending && !isSentOffer)
+                // Action Buttons - Updated Logic
+                if (_shouldShowActions())
                   Padding(
                     padding: const EdgeInsets.only(top: 16),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: OutlinedButton.icon(
-                            onPressed: () => onAction('reject'),
-                            icon: const Icon(LucideIcons.x, size: 16),
-                            label: const Text('Reject'),
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor: Colors.red,
-                              side: const BorderSide(color: Colors.red),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: OutlinedButton.icon(
-                            onPressed: () => onAction('counter'),
-                            icon: const Icon(LucideIcons.arrowLeftRight, size: 16),
-                            label: const Text('Counter'),
-                            style: OutlinedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 12),
-                              foregroundColor: Colors.orange,
-                              side: const BorderSide(color: Colors.orange),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: ElevatedButton.icon(
-                            onPressed: () => onAction('accept'),
-                            icon: const Icon(LucideIcons.check, size: 12),
-                            label: const Text('Accept'),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.green,
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 12), // Adjust here
-                              textStyle: const TextStyle(fontSize: 14), // Optional: tweak text size
-                              tapTargetSize: MaterialTapTargetSize.shrinkWrap, // Optional: tighter height
-                            ),
-                          ),
-                        ),
-
-                      ],
-                    ),
+                    child: _buildActionButtons(),
                   ),
 
                 // Status Messages
                 if (offer.status == OfferStatus.accepted)
                   Padding(
                     padding: const EdgeInsets.only(top: 16),
-                    child: Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.green[50],
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Colors.green[200]!),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(LucideIcons.checkCircle, color: Colors.green[600], size: 16),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              isSentOffer
-                                  ? 'Your offer has been accepted! 🎉'
-                                  : 'You accepted this offer! 🎉',
-                              style: TextStyle(
-                                color: Colors.green[700],
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                    child: _buildAcceptedStatusWidget(),
                   ),
 
                 if (offer.status == OfferStatus.rejected)
@@ -355,9 +287,7 @@ class OfferCard extends StatelessWidget {
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
-                              isSentOffer
-                                  ? 'Your offer was rejected'
-                                  : 'You rejected this offer',
+                              _getRejectionText(),
                               style: TextStyle(
                                 color: Colors.red[700],
                                 fontWeight: FontWeight.w500,
@@ -386,9 +316,7 @@ class OfferCard extends StatelessWidget {
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
-                              isSentOffer
-                                  ? 'Seller made a counter offer'
-                                  : 'You made a counter offer',
+                              _getCounteredText(),
                               style: TextStyle(
                                 color: Colors.orange[700],
                                 fontWeight: FontWeight.w500,
@@ -405,6 +333,161 @@ class OfferCard extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  // Helper method to determine if actions should be shown
+  bool _shouldShowActions() {
+    if (offer.status != OfferStatus.pending) return false;
+
+    // For regular offers: show actions only for received offers
+    if (!offer.isCounterOffer) {
+      return !isSentOffer;
+    }
+
+    // For counter offers: show actions based on who made the counter offer
+    // If it's in sent offers but it's a counter offer from seller, buyer should see actions
+    // If it's in received offers but it's a counter offer from buyer, seller should see actions
+    return true;
+  }
+
+  // Helper method to build action buttons
+  Widget _buildActionButtons() {
+    return Row(
+      children: [
+        Expanded(
+          child: OutlinedButton.icon(
+            onPressed: () => onAction('reject'),
+            icon: const Icon(LucideIcons.x, size: 16),
+            label: const Text('Reject'),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: Colors.red,
+              side: const BorderSide(color: Colors.red),
+            ),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: OutlinedButton.icon(
+            onPressed: () => onAction('counter'),
+            icon: const Icon(LucideIcons.arrowLeftRight, size: 16),
+            label: const Text('Counter'),
+            style: OutlinedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 12),
+              foregroundColor: Colors.orange,
+              side: const BorderSide(color: Colors.orange),
+            ),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: ElevatedButton.icon(
+            onPressed: () => onAction('accept'),
+            icon: const Icon(LucideIcons.check, size: 16),
+            label: const Text('Accept'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 12),
+              textStyle: const TextStyle(fontSize: 14),
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // Helper method to build accepted status widget with payment action
+  Widget _buildAcceptedStatusWidget() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.green[50],
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.green[200]!),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(LucideIcons.checkCircle, color: Colors.green[600], size: 16),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  _getAcceptedText(),
+                  style: TextStyle(
+                    color: Colors.green[700],
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: () => onAction('proceed_payment'),
+              icon: const Icon(LucideIcons.creditCard, size: 16),
+              label: Text(_getPaymentButtonText()),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF002F34),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 12),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Helper methods for text content
+  String _getOfferTypeText() {
+    if (offer.isCounterOffer) {
+      return isSentOffer ? 'Counter Offer from Seller' : 'Counter Offer from Buyer';
+    }
+    return isSentOffer ? 'Offer Sent' : 'Offer Received';
+  }
+
+  String _getParticipantText() {
+    if (offer.isCounterOffer) {
+      return isSentOffer ? 'From: ${offer.sellerName}' : 'From: ${offer.buyerName}';
+    }
+    return isSentOffer ? 'To: ${offer.sellerName}' : 'From: ${offer.buyerName}';
+  }
+
+  String _getAcceptedText() {
+    if (offer.isCounterOffer) {
+      return isSentOffer ? 'Counter offer accepted! 🎉' : 'You accepted the counter offer! 🎉';
+    }
+    return isSentOffer ? 'Your offer has been accepted! 🎉' : 'You accepted this offer! 🎉';
+  }
+
+  String _getRejectionText() {
+    if (offer.isCounterOffer) {
+      return isSentOffer ? 'Counter offer was rejected' : 'You rejected the counter offer';
+    }
+    return isSentOffer ? 'Your offer was rejected' : 'You rejected this offer';
+  }
+
+  String _getCounteredText() {
+    if (offer.isCounterOffer) {
+      return 'This offer has been countered';
+    }
+    return isSentOffer ? 'Seller made a counter offer' : 'You made a counter offer';
+  }
+
+  String _getPaymentButtonText() {
+    // If this is a sent offer (buyer's perspective) and it's accepted, buyer should pay
+    // If this is a received offer (seller's perspective) and it's accepted, seller should request payment
+    if (isSentOffer) {
+      return 'Proceed to Payment';
+    } else {
+      return 'Send Payment Request';
+    }
   }
 
   Color _getStatusColor(OfferStatus status) {
