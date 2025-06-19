@@ -58,13 +58,10 @@ lib/
 - Image upload for prod ucts ✅
 - Categories and filtering  ✅
 - Favorites/wishlist functionality ✅
-- Buyer should able counter the offer (it would be different from chat) 
-  - if seller agree he can generate a qr to pay that amount to buyer.
-  - or else seller can give counter offer again and buyer can accept and they can procide further.
-- **Shipping Options for Seller**
-  - Choose between courier or speed post
-  - Could be a dropdown or input field when listing
-- **Order Tracking Info from Seller - Tracking number, Shipping method info**
+- Buyer should able counter the offer ✅
+  - if seller agree he can generate a qr to pay that amount to buyer.✅
+  - or else seller can give counter offer again and buyer can accept and they can procide further.✅
+- After the seller or buyer agree on the offer, seller should able to payment and buyer should provide a generated delivery courier receipt with mockup tracking number.
 - **Rating System -** After a transaction, users should be able to Rate the other party
 - mockup payment page. 
 
