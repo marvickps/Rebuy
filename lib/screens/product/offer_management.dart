@@ -14,7 +14,8 @@ class OffersScreen extends StatefulWidget {
   State<OffersScreen> createState() => _OffersScreenState();
 }
 
-class _OffersScreenState extends State<OffersScreen> with SingleTickerProviderStateMixin {
+class _OffersScreenState extends State<OffersScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   @override
@@ -103,7 +104,9 @@ class _OffersScreenState extends State<OffersScreen> with SingleTickerProviderSt
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Are you sure you want to reject the offer of ₹${offer.offerAmount.toStringAsFixed(0)}?'),
+            Text(
+              'Are you sure you want to reject the offer of ₹${offer.offerAmount.toStringAsFixed(0)}?',
+            ),
             const SizedBox(height: 16),
             TextField(
               controller: reasonController,
@@ -123,10 +126,15 @@ class _OffersScreenState extends State<OffersScreen> with SingleTickerProviderSt
           ),
           TextButton(
             onPressed: () async {
-              final offerProvider = Provider.of<OfferProvider>(context, listen: false);
+              final offerProvider = Provider.of<OfferProvider>(
+                context,
+                listen: false,
+              );
               final success = await offerProvider.rejectOffer(
                 offer.id,
-                reason: reasonController.text.trim().isEmpty ? null : reasonController.text.trim(),
+                reason: reasonController.text.trim().isEmpty
+                    ? null
+                    : reasonController.text.trim(),
               );
               Navigator.of(context).pop(success);
             },
@@ -154,7 +162,7 @@ class _OffersScreenState extends State<OffersScreen> with SingleTickerProviderSt
     return Scaffold(
       appBar: AppBar(
         title: const Text('My Offers'),
-        backgroundColor: const Color(0xFF002F34),
+        backgroundColor: const Color(0xFF078893),
         foregroundColor: Colors.white,
         bottom: TabBar(
           controller: _tabController,

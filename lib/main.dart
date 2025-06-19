@@ -47,20 +47,20 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           primarySwatch: Colors.blue,
-          primaryColor: const Color(0xFF002F34),
+          primaryColor: const Color(0xFF078893),
           colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color(0xFF002F34),
+            seedColor: const Color(0xFF078893),
             brightness: Brightness.light,
           ),
           textTheme: GoogleFonts.poppinsTextTheme(),
           appBarTheme: const AppBarTheme(
-            backgroundColor: Color(0xFF002F34),
+            backgroundColor: Color(0xFF078893),
             foregroundColor: Colors.white,
             elevation: 0,
           ),
           elevatedButtonTheme: ElevatedButtonThemeData(
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF002F34),
+              backgroundColor: const Color(0xFF078893),
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
               shape: RoundedRectangleBorder(
@@ -69,12 +69,10 @@ class MyApp extends StatelessWidget {
             ),
           ),
           inputDecorationTheme: InputDecorationTheme(
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Color(0xFF002F34), width: 2),
+              borderSide: const BorderSide(color: Color(0xFF078893), width: 2),
             ),
           ),
         ),
@@ -82,15 +80,23 @@ class MyApp extends StatelessWidget {
         onGenerateRoute: (settings) {
           switch (settings.name) {
             case '/login':
-              return MaterialPageRoute(builder: (context) => const LoginScreen());
+              return MaterialPageRoute(
+                builder: (context) => const LoginScreen(),
+              );
             case '/signup':
-              return MaterialPageRoute(builder: (context) => const SignupScreen());
+              return MaterialPageRoute(
+                builder: (context) => const SignupScreen(),
+              );
             case '/home':
-              return MaterialPageRoute(builder: (context) => const HomeScreen());
+              return MaterialPageRoute(
+                builder: (context) => const HomeScreen(),
+              );
             case '/add-product':
-              return MaterialPageRoute(builder: (context) => const AddProductScreen());
+              return MaterialPageRoute(
+                builder: (context) => const AddProductScreen(),
+              );
             case '/product-detail':
-            // Handle ProductDetailScreen with arguments
+              // Handle ProductDetailScreen with arguments
               final args = settings.arguments as Map<String, dynamic>?;
               if (args != null && args.containsKey('productId')) {
                 return MaterialPageRoute(
@@ -101,18 +107,24 @@ class MyApp extends StatelessWidget {
                 );
               }
               // Fallback to home if no proper arguments
-              return MaterialPageRoute(builder: (context) => const HomeScreen());
-          // Add other routes as needed
-          case '/chat-list':
-            return MaterialPageRoute(builder: (context) => const ChatListScreen());
-          // case '/chat':
-          //   return MaterialPageRoute(builder: (context) => const ChatScreen());
-          // case '/profile':
-          //   return MaterialPageRoute(builder: (context) => const ProfileScreen());
-          // case '/payment':
-          //   return MaterialPageRoute(builder: (context) => const PaymentScreen());
+              return MaterialPageRoute(
+                builder: (context) => const HomeScreen(),
+              );
+            // Add other routes as needed
+            case '/chat-list':
+              return MaterialPageRoute(
+                builder: (context) => const ChatListScreen(),
+              );
+            // case '/chat':
+            //   return MaterialPageRoute(builder: (context) => const ChatScreen());
+            // case '/profile':
+            //   return MaterialPageRoute(builder: (context) => const ProfileScreen());
+            // case '/payment':
+            //   return MaterialPageRoute(builder: (context) => const PaymentScreen());
             default:
-              return MaterialPageRoute(builder: (context) => const HomeScreen());
+              return MaterialPageRoute(
+                builder: (context) => const HomeScreen(),
+              );
           }
         },
         routes: {

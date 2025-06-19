@@ -6,10 +6,7 @@ import '../../models/offer_model.dart';
 class PaymentScreen extends StatefulWidget {
   final OfferModel offer;
 
-  const PaymentScreen({
-    super.key,
-    required this.offer,
-  });
+  const PaymentScreen({super.key, required this.offer});
 
   @override
   State<PaymentScreen> createState() => _PaymentScreenState();
@@ -83,9 +80,13 @@ class _PaymentScreenState extends State<PaymentScreen> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text('Scan the QR code with your UPI app to complete the payment.'),
+            const Text(
+              'Scan the QR code with your UPI app to complete the payment.',
+            ),
             const SizedBox(height: 16),
-            const Text('Once payment is successful, click "I have paid" button.'),
+            const Text(
+              'Once payment is successful, click "I have paid" button.',
+            ),
           ],
         ),
         actions: [
@@ -144,7 +145,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Payment'),
-        backgroundColor: const Color(0xFF002F34),
+        backgroundColor: const Color(0xFF078893),
         foregroundColor: Colors.white,
       ),
       body: SingleChildScrollView(
@@ -187,25 +188,25 @@ class _PaymentScreenState extends State<PaymentScreen> {
                   borderRadius: BorderRadius.circular(8),
                   child: widget.offer.productImageUrl.isNotEmpty
                       ? Image.network(
-                    widget.offer.productImageUrl,
-                    width: 60,
-                    height: 60,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        width: 60,
-                        height: 60,
-                        color: Colors.grey[200],
-                        child: const Icon(LucideIcons.image),
-                      );
-                    },
-                  )
+                          widget.offer.productImageUrl,
+                          width: 60,
+                          height: 60,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              width: 60,
+                              height: 60,
+                              color: Colors.grey[200],
+                              child: const Icon(LucideIcons.image),
+                            );
+                          },
+                        )
                       : Container(
-                    width: 60,
-                    height: 60,
-                    color: Colors.grey[200],
-                    child: const Icon(LucideIcons.image),
-                  ),
+                          width: 60,
+                          height: 60,
+                          color: Colors.grey[200],
+                          child: const Icon(LucideIcons.image),
+                        ),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
@@ -237,7 +238,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 const Text('Item Price:'),
                 Text(
                   '₹${widget.offer.originalPrice.toStringAsFixed(0)}',
-                  style: const TextStyle(decoration: TextDecoration.lineThrough),
+                  style: const TextStyle(
+                    decoration: TextDecoration.lineThrough,
+                  ),
                 ),
               ],
             ),
@@ -245,13 +248,16 @@ class _PaymentScreenState extends State<PaymentScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Offer Price:', style: TextStyle(fontWeight: FontWeight.w500)),
+                const Text(
+                  'Offer Price:',
+                  style: TextStyle(fontWeight: FontWeight.w500),
+                ),
                 Text(
                   '₹${widget.offer.offerAmount.toStringAsFixed(0)}',
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF002F34),
+                    color: Color(0xFF078893),
                   ),
                 ),
               ],
@@ -262,7 +268,10 @@ class _PaymentScreenState extends State<PaymentScreen> {
               children: [
                 Text(
                   'You Save:',
-                  style: TextStyle(color: Colors.green[600], fontWeight: FontWeight.w500),
+                  style: TextStyle(
+                    color: Colors.green[600],
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
                 Text(
                   '₹${(widget.offer.originalPrice - widget.offer.offerAmount).toStringAsFixed(0)} (${widget.offer.discountPercentage.toStringAsFixed(1)}%)',
@@ -312,7 +321,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                   method['description'],
                   style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                 ),
-                activeColor: const Color(0xFF002F34),
+                activeColor: const Color(0xFF078893),
               );
             }),
           ],
@@ -346,17 +355,21 @@ class _PaymentScreenState extends State<PaymentScreen> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
-                onPressed: upiIdController.text.trim().isEmpty ? null : _generateQRCode,
+                onPressed: upiIdController.text.trim().isEmpty
+                    ? null
+                    : _generateQRCode,
                 icon: isGeneratingQR
                     ? const SizedBox(
-                  width: 16,
-                  height: 16,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
                     : const Icon(LucideIcons.qrCode),
-                label: Text(isGeneratingQR ? 'Generating QR...' : 'Generate QR Code'),
+                label: Text(
+                  isGeneratingQR ? 'Generating QR...' : 'Generate QR Code',
+                ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF002F34),
+                  backgroundColor: const Color(0xFF078893),
                   foregroundColor: Colors.white,
                 ),
               ),
@@ -399,7 +412,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 child: ElevatedButton.icon(
                   onPressed: _processPayment,
                   icon: const Icon(LucideIcons.creditCard),
-                  label: Text('Pay ₹${widget.offer.offerAmount.toStringAsFixed(0)}'),
+                  label: Text(
+                    'Pay ₹${widget.offer.offerAmount.toStringAsFixed(0)}',
+                  ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green,
                     foregroundColor: Colors.white,
@@ -413,7 +428,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
       ),
     );
   }
-
 
   Widget _buildCODPayment() {
     return Card(

@@ -127,7 +127,9 @@ class _ChatScreenState extends State<ChatScreen> {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
       child: Row(
-        mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment: isMe
+            ? MainAxisAlignment.end
+            : MainAxisAlignment.start,
         children: [
           if (!isMe) ...[
             CircleAvatar(
@@ -137,7 +139,10 @@ class _ChatScreenState extends State<ChatScreen> {
                 message.senderName.isNotEmpty
                     ? message.senderName[0].toUpperCase()
                     : 'U',
-                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
             const SizedBox(width: 8),
@@ -146,7 +151,7 @@ class _ChatScreenState extends State<ChatScreen> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               decoration: BoxDecoration(
-                color: isMe ? const Color(0xFF002F34) : Colors.grey[200],
+                color: isMe ? const Color(0xFF078893) : Colors.grey[200],
                 borderRadius: BorderRadius.circular(18),
               ),
               child: Column(
@@ -187,7 +192,7 @@ class _ChatScreenState extends State<ChatScreen> {
             const SizedBox(width: 8),
             CircleAvatar(
               radius: 16,
-              backgroundColor: const Color(0xFF002F34),
+              backgroundColor: const Color(0xFF078893),
               child: Text(
                 message.senderName.isNotEmpty
                     ? message.senderName[0].toUpperCase()
@@ -232,15 +237,12 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFF002F34),
+        backgroundColor: const Color(0xFF078893),
         foregroundColor: Colors.white,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              widget.otherUserName,
-              style: const TextStyle(fontSize: 18),
-            ),
+            Text(widget.otherUserName, style: const TextStyle(fontSize: 18)),
             Text(
               widget.productTitle,
               style: const TextStyle(fontSize: 12, color: Colors.white70),
@@ -300,9 +302,7 @@ class _ChatScreenState extends State<ChatScreen> {
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: Colors.grey[50],
-                border: Border(
-                  bottom: BorderSide(color: Colors.grey[200]!),
-                ),
+                border: Border(bottom: BorderSide(color: Colors.grey[200]!)),
               ),
               child: Row(
                 children: [
@@ -322,10 +322,8 @@ class _ChatScreenState extends State<ChatScreen> {
                           placeholder: (context, url) => const Center(
                             child: CircularProgressIndicator(strokeWidth: 2),
                           ),
-                          errorWidget: (context, url, error) => const Icon(
-                            LucideIcons.image,
-                            color: Colors.grey,
-                          ),
+                          errorWidget: (context, url, error) =>
+                              const Icon(LucideIcons.image, color: Colors.grey),
                         ),
                       ),
                     ),
@@ -348,7 +346,7 @@ class _ChatScreenState extends State<ChatScreen> {
                             '₹${widget.productPrice!.toStringAsFixed(0)}',
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
-                              color: Color(0xFF002F34),
+                              color: Color(0xFF078893),
                               fontSize: 16,
                             ),
                           ),
@@ -372,7 +370,11 @@ class _ChatScreenState extends State<ChatScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(LucideIcons.alertCircle, size: 64, color: Colors.red),
+                        const Icon(
+                          LucideIcons.alertCircle,
+                          size: 64,
+                          color: Colors.red,
+                        ),
                         const SizedBox(height: 16),
                         Text(
                           'Error: ${chatProvider.errorMessage}',
@@ -401,11 +403,18 @@ class _ChatScreenState extends State<ChatScreen> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(LucideIcons.messageCircle, size: 64, color: Colors.grey),
+                            Icon(
+                              LucideIcons.messageCircle,
+                              size: 64,
+                              color: Colors.grey,
+                            ),
                             SizedBox(height: 16),
                             Text(
                               'No messages yet',
-                              style: TextStyle(fontSize: 18, color: Colors.grey),
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.grey,
+                              ),
                             ),
                             SizedBox(height: 8),
                             Text(
@@ -486,25 +495,25 @@ class _ChatScreenState extends State<ChatScreen> {
                   child: Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: _isTyping
-                          ? Colors.grey
-                          : const Color(0xFF002F34),
+                      color: _isTyping ? Colors.grey : const Color(0xFF078893),
                       shape: BoxShape.circle,
                     ),
                     child: _isTyping
                         ? const SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                      ),
-                    )
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                Colors.white,
+                              ),
+                            ),
+                          )
                         : const Icon(
-                      LucideIcons.send,
-                      color: Colors.white,
-                      size: 24,
-                    ),
+                            LucideIcons.send,
+                            color: Colors.white,
+                            size: 24,
+                          ),
                   ),
                 ),
               ],
@@ -547,7 +556,9 @@ class _ChatScreenState extends State<ChatScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Clear Chat'),
-        content: const Text('Are you sure you want to clear this chat? This action cannot be undone.'),
+        content: const Text(
+          'Are you sure you want to clear this chat? This action cannot be undone.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),

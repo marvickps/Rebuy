@@ -12,7 +12,7 @@ class SellTab extends StatelessWidget {
           const Icon(
             Icons.add_circle_outline,
             size: 80,
-            color: Color(0xFF002F34),
+            color: Color(0xFF078893),
           ),
           const SizedBox(height: 24),
           const Text(
@@ -20,16 +20,13 @@ class SellTab extends StatelessWidget {
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF002F34),
+              color: Color(0xFF078893),
             ),
           ),
           const SizedBox(height: 12),
           const Text(
             'Start selling by adding your first product',
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey,
-            ),
+            style: TextStyle(fontSize: 16, color: Colors.grey),
           ),
           const SizedBox(height: 32),
           ElevatedButton.icon(
@@ -39,7 +36,7 @@ class SellTab extends StatelessWidget {
             icon: const Icon(Icons.add),
             label: const Text('Add Product'),
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF002F34),
+              backgroundColor: const Color(0xFF078893),
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
               shape: RoundedRectangleBorder(
@@ -54,7 +51,7 @@ class SellTab extends StatelessWidget {
             },
             child: const Text(
               'View My Products',
-              style: TextStyle(color: Color(0xFF002F34)),
+              style: TextStyle(color: Color(0xFF078893)),
             ),
           ),
         ],

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:intl/intl.dart';
 import '../../../models/offer_model.dart';
+import '../payment.dart';
 
 class OfferCard extends StatelessWidget {
   final OfferModel offer;
@@ -62,7 +63,10 @@ class OfferCard extends StatelessWidget {
                 ),
                 if (offer.isCounterOffer)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.orange[100],
                       borderRadius: BorderRadius.circular(12),
@@ -90,25 +94,31 @@ class OfferCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                   child: offer.productImageUrl.isNotEmpty
                       ? Image.network(
-                    offer.productImageUrl,
-                    width: 80,
-                    height: 80,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        width: 80,
-                        height: 80,
-                        color: Colors.grey[200],
-                        child: const Icon(LucideIcons.image, color: Colors.grey),
-                      );
-                    },
-                  )
+                          offer.productImageUrl,
+                          width: 80,
+                          height: 80,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              width: 80,
+                              height: 80,
+                              color: Colors.grey[200],
+                              child: const Icon(
+                                LucideIcons.image,
+                                color: Colors.grey,
+                              ),
+                            );
+                          },
+                        )
                       : Container(
-                    width: 80,
-                    height: 80,
-                    color: Colors.grey[200],
-                    child: const Icon(LucideIcons.image, color: Colors.grey),
-                  ),
+                          width: 80,
+                          height: 80,
+                          color: Colors.grey[200],
+                          child: const Icon(
+                            LucideIcons.image,
+                            color: Colors.grey,
+                          ),
+                        ),
                 ),
                 const SizedBox(width: 16),
 
@@ -129,10 +139,7 @@ class OfferCard extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text(
                         _getParticipantText(),
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[600],
-                        ),
+                        style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                       ),
                       const SizedBox(height: 8),
                       Row(
@@ -151,7 +158,7 @@ class OfferCard extends StatelessWidget {
                             style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
-                              color: Color(0xFF002F34),
+                              color: Color(0xFF078893),
                             ),
                           ),
                         ],
@@ -198,7 +205,11 @@ class OfferCard extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        Icon(LucideIcons.messageCircle, size: 14, color: Colors.grey[600]),
+                        Icon(
+                          LucideIcons.messageCircle,
+                          size: 14,
+                          color: Colors.grey[600],
+                        ),
                         const SizedBox(width: 4),
                         Text(
                           'Message:',
@@ -211,10 +222,7 @@ class OfferCard extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 4),
-                    Text(
-                      offer.message!,
-                      style: const TextStyle(fontSize: 14),
-                    ),
+                    Text(offer.message!, style: const TextStyle(fontSize: 14)),
                   ],
                 ),
               ),
@@ -233,16 +241,17 @@ class OfferCard extends StatelessWidget {
                     const SizedBox(width: 4),
                     Text(
                       _formatDateTime(offer.createdAt),
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey[500],
-                      ),
+                      style: TextStyle(fontSize: 12, color: Colors.grey[500]),
                     ),
                     const Spacer(),
                     if (offer.status == OfferStatus.pending)
                       Row(
                         children: [
-                          Icon(LucideIcons.timer, size: 14, color: Colors.orange[600]),
+                          Icon(
+                            LucideIcons.timer,
+                            size: 14,
+                            color: Colors.orange[600],
+                          ),
                           const SizedBox(width: 4),
                           Text(
                             'Expires ${_formatDateTime(offer.expiresAt)}',
@@ -267,7 +276,7 @@ class OfferCard extends StatelessWidget {
                 if (offer.status == OfferStatus.accepted)
                   Padding(
                     padding: const EdgeInsets.only(top: 16),
-                    child: _buildAcceptedStatusWidget(),
+                    child: _buildAcceptedStatusWidget(context),
                   ),
 
                 if (offer.status == OfferStatus.rejected)
@@ -283,7 +292,11 @@ class OfferCard extends StatelessWidget {
                       ),
                       child: Row(
                         children: [
-                          Icon(LucideIcons.xCircle, color: Colors.red[600], size: 16),
+                          Icon(
+                            LucideIcons.xCircle,
+                            color: Colors.red[600],
+                            size: 16,
+                          ),
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
@@ -312,7 +325,11 @@ class OfferCard extends StatelessWidget {
                       ),
                       child: Row(
                         children: [
-                          Icon(LucideIcons.arrowLeftRight, color: Colors.orange[600], size: 16),
+                          Icon(
+                            LucideIcons.arrowLeftRight,
+                            color: Colors.orange[600],
+                            size: 16,
+                          ),
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
@@ -398,7 +415,7 @@ class OfferCard extends StatelessWidget {
   }
 
   // Helper method to build accepted status widget with payment action
-  Widget _buildAcceptedStatusWidget() {
+  Widget _buildAcceptedStatusWidget(BuildContext context) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(12),
@@ -429,11 +446,11 @@ class OfferCard extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
-              onPressed: () => onAction('proceed_payment'),
+              onPressed: () => _handlePaymentAction(context),
               icon: const Icon(LucideIcons.creditCard, size: 16),
               label: Text(_getPaymentButtonText()),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF002F34),
+                backgroundColor: const Color(0xFF078893),
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 12),
               ),
@@ -444,31 +461,141 @@ class OfferCard extends StatelessWidget {
     );
   }
 
+  // Handle payment action
+  void _handlePaymentAction(BuildContext context) {
+    if (isSentOffer) {
+      // Buyer should proceed to payment
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => PaymentScreen(offer: offer)),
+      );
+    } else {
+      // Seller should send payment request or generate delivery receipt
+      _showSellerOptions(context);
+    }
+  }
+
+  // Show seller options after offer acceptance
+  void _showSellerOptions(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              'Offer Accepted!',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'The buyer has accepted your offer of ₹${offer.offerAmount.toStringAsFixed(0)}',
+              style: TextStyle(color: Colors.grey[600]),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.pop(context);
+                  // Navigate to payment request or order management
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Payment request sent to buyer'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                },
+                icon: const Icon(LucideIcons.send),
+                label: const Text('Send Payment Request'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF078893),
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () {
+                  Navigator.pop(context);
+                  // Navigate to delivery preparation
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                        'Prepare item for delivery once payment is confirmed',
+                      ),
+                      backgroundColor: Colors.orange,
+                    ),
+                  );
+                },
+                icon: const Icon(LucideIcons.package),
+                label: const Text('Prepare for Delivery'),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.orange,
+                  side: const BorderSide(color: Colors.orange),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
+      ),
+    );
+  }
+
   // Helper methods for text content
   String _getOfferTypeText() {
     if (offer.isCounterOffer) {
-      return isSentOffer ? 'Counter Offer from Seller' : 'Counter Offer from Buyer';
+      return isSentOffer
+          ? 'Counter Offer from Seller'
+          : 'Counter Offer from Buyer';
     }
     return isSentOffer ? 'Offer Sent' : 'Offer Received';
   }
 
   String _getParticipantText() {
     if (offer.isCounterOffer) {
-      return isSentOffer ? 'From: ${offer.sellerName}' : 'From: ${offer.buyerName}';
+      return isSentOffer
+          ? 'From: ${offer.sellerName}'
+          : 'From: ${offer.buyerName}';
     }
     return isSentOffer ? 'To: ${offer.sellerName}' : 'From: ${offer.buyerName}';
   }
 
   String _getAcceptedText() {
     if (offer.isCounterOffer) {
-      return isSentOffer ? 'Counter offer accepted! 🎉' : 'You accepted the counter offer! 🎉';
+      return isSentOffer
+          ? 'Counter offer accepted! 🎉'
+          : 'You accepted the counter offer! 🎉';
     }
-    return isSentOffer ? 'Your offer has been accepted! 🎉' : 'You accepted this offer! 🎉';
+    return isSentOffer
+        ? 'Your offer has been accepted! 🎉'
+        : 'You accepted this offer! 🎉';
   }
 
   String _getRejectionText() {
     if (offer.isCounterOffer) {
-      return isSentOffer ? 'Counter offer was rejected' : 'You rejected the counter offer';
+      return isSentOffer
+          ? 'Counter offer was rejected'
+          : 'You rejected the counter offer';
     }
     return isSentOffer ? 'Your offer was rejected' : 'You rejected this offer';
   }
@@ -477,7 +604,9 @@ class OfferCard extends StatelessWidget {
     if (offer.isCounterOffer) {
       return 'This offer has been countered';
     }
-    return isSentOffer ? 'Seller made a counter offer' : 'You made a counter offer';
+    return isSentOffer
+        ? 'Seller made a counter offer'
+        : 'You made a counter offer';
   }
 
   String _getPaymentButtonText() {
@@ -486,7 +615,7 @@ class OfferCard extends StatelessWidget {
     if (isSentOffer) {
       return 'Proceed to Payment';
     } else {
-      return 'Send Payment Request';
+      return 'Manage Order';
     }
   }
 
@@ -508,15 +637,35 @@ class OfferCard extends StatelessWidget {
   Widget _getStatusIcon(OfferStatus status) {
     switch (status) {
       case OfferStatus.pending:
-        return Icon(LucideIcons.clock, color: _getStatusColor(status), size: 16);
+        return Icon(
+          LucideIcons.clock,
+          color: _getStatusColor(status),
+          size: 16,
+        );
       case OfferStatus.accepted:
-        return Icon(LucideIcons.checkCircle, color: _getStatusColor(status), size: 16);
+        return Icon(
+          LucideIcons.checkCircle,
+          color: _getStatusColor(status),
+          size: 16,
+        );
       case OfferStatus.rejected:
-        return Icon(LucideIcons.xCircle, color: _getStatusColor(status), size: 16);
+        return Icon(
+          LucideIcons.xCircle,
+          color: _getStatusColor(status),
+          size: 16,
+        );
       case OfferStatus.countered:
-        return Icon(LucideIcons.arrowLeftRight, color: _getStatusColor(status), size: 16);
+        return Icon(
+          LucideIcons.arrowLeftRight,
+          color: _getStatusColor(status),
+          size: 16,
+        );
       case OfferStatus.expired:
-        return Icon(LucideIcons.alarmClockOff, color: _getStatusColor(status), size: 16);
+        return Icon(
+          LucideIcons.alarmClockOff,
+          color: _getStatusColor(status),
+          size: 16,
+        );
     }
   }
 

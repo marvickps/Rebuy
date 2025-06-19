@@ -7,7 +7,6 @@ import '../../../providers/auth_provider.dart';
 import '../../../providers/chat_provider.dart';
 import 'chat_screen.dart';
 
-
 class ChatListScreen extends StatefulWidget {
   const ChatListScreen({super.key});
 
@@ -22,8 +21,10 @@ class _ChatListScreenState extends State<ChatListScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       if (authProvider.user != null) {
-        Provider.of<ChatProvider>(context, listen: false)
-            .loadChats(authProvider.user!.uid);
+        Provider.of<ChatProvider>(
+          context,
+          listen: false,
+        ).loadChats(authProvider.user!.uid);
       }
     });
   }
@@ -51,7 +52,9 @@ class _ChatListScreenState extends State<ChatListScreen> {
 
   Widget _buildChatTile(ChatModel chat, String currentUserId) {
     final isFromCurrentUser = chat.lastMessageSenderId == currentUserId;
-    final otherUserName = chat.buyerId == currentUserId ? chat.sellerName : chat.buyerName;
+    final otherUserName = chat.buyerId == currentUserId
+        ? chat.sellerName
+        : chat.buyerName;
     final hasUnreadMessages = chat.unreadCount > 0 && !isFromCurrentUser;
 
     return Card(
@@ -72,20 +75,17 @@ class _ChatListScreenState extends State<ChatListScreen> {
                 borderRadius: BorderRadius.circular(8),
                 child: chat.productImageUrl.isNotEmpty
                     ? CachedNetworkImage(
-                  imageUrl: chat.productImageUrl,
-                  fit: BoxFit.cover,
-                  placeholder: (context, url) => const Center(
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  ),
-                  errorWidget: (context, url, error) => const Icon(
-                    Icons.image_not_supported,
-                    color: Colors.grey,
-                  ),
-                )
-                    : const Icon(
-                  Icons.image_not_supported,
-                  color: Colors.grey,
-                ),
+                        imageUrl: chat.productImageUrl,
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) => const Center(
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                        errorWidget: (context, url, error) => const Icon(
+                          Icons.image_not_supported,
+                          color: Colors.grey,
+                        ),
+                      )
+                    : const Icon(Icons.image_not_supported, color: Colors.grey),
               ),
             ),
             // Unread indicator
@@ -121,20 +121,14 @@ class _ChatListScreenState extends State<ChatListScreen> {
           children: [
             Text(
               chat.productTitle,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
-              ),
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
             const SizedBox(height: 2),
             Text(
               otherUserName,
-              style: TextStyle(
-                fontSize: 13,
-                color: Colors.grey[600],
-              ),
+              style: TextStyle(fontSize: 13, color: Colors.grey[600]),
             ),
           ],
         ),
@@ -144,7 +138,9 @@ class _ChatListScreenState extends State<ChatListScreen> {
             isFromCurrentUser ? 'You: ${chat.lastMessage}' : chat.lastMessage,
             style: TextStyle(
               color: hasUnreadMessages ? Colors.black87 : Colors.grey[600],
-              fontWeight: hasUnreadMessages ? FontWeight.w600 : FontWeight.normal,
+              fontWeight: hasUnreadMessages
+                  ? FontWeight.w600
+                  : FontWeight.normal,
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
@@ -158,8 +154,12 @@ class _ChatListScreenState extends State<ChatListScreen> {
               _formatTime(chat.lastMessageTime),
               style: TextStyle(
                 fontSize: 12,
-                color: hasUnreadMessages ? const Color(0xFF002F34) : Colors.grey[500],
-                fontWeight: hasUnreadMessages ? FontWeight.w600 : FontWeight.normal,
+                color: hasUnreadMessages
+                    ? const Color(0xFF078893)
+                    : Colors.grey[500],
+                fontWeight: hasUnreadMessages
+                    ? FontWeight.w600
+                    : FontWeight.normal,
               ),
             ),
             const SizedBox(height: 4),
@@ -168,7 +168,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
               style: const TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF002F34),
+                color: Color(0xFF078893),
               ),
             ),
           ],
@@ -200,7 +200,10 @@ class _ChatListScreenState extends State<ChatListScreen> {
           children: [
             ListTile(
               leading: const Icon(Icons.delete_outline, color: Colors.red),
-              title: const Text('Delete Chat', style: TextStyle(color: Colors.red)),
+              title: const Text(
+                'Delete Chat',
+                style: TextStyle(color: Colors.red),
+              ),
               onTap: () {
                 Navigator.pop(context);
                 _showDeleteConfirmation(context, chat);
@@ -225,7 +228,9 @@ class _ChatListScreenState extends State<ChatListScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Delete Chat'),
-        content: const Text('Are you sure you want to delete this chat? This action cannot be undone.'),
+        content: const Text(
+          'Are you sure you want to delete this chat? This action cannot be undone.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -234,7 +239,10 @@ class _ChatListScreenState extends State<ChatListScreen> {
           TextButton(
             onPressed: () async {
               Navigator.pop(context);
-              final chatProvider = Provider.of<ChatProvider>(context, listen: false);
+              final chatProvider = Provider.of<ChatProvider>(
+                context,
+                listen: false,
+              );
               await chatProvider.deleteChat(chat.id);
 
               ScaffoldMessenger.of(context).showSnackBar(
@@ -286,7 +294,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Chats'),
-        backgroundColor: const Color(0xFF002F34),
+        backgroundColor: const Color(0xFF078893),
         foregroundColor: Colors.white,
       ),
       body: Consumer2<ChatProvider, AuthProvider>(
@@ -298,7 +306,10 @@ class _ChatListScreenState extends State<ChatListScreen> {
                 children: [
                   Icon(Icons.login, size: 64, color: Colors.grey),
                   SizedBox(height: 16),
-                  Text('Please login to view chats', style: TextStyle(fontSize: 18)),
+                  Text(
+                    'Please login to view chats',
+                    style: TextStyle(fontSize: 18),
+                  ),
                 ],
               ),
             );
@@ -339,7 +350,10 @@ class _ChatListScreenState extends State<ChatListScreen> {
                 children: [
                   Icon(Icons.chat_bubble_outline, size: 64, color: Colors.grey),
                   SizedBox(height: 16),
-                  Text('No chats yet', style: TextStyle(fontSize: 18, color: Colors.grey)),
+                  Text(
+                    'No chats yet',
+                    style: TextStyle(fontSize: 18, color: Colors.grey),
+                  ),
                   SizedBox(height: 8),
                   Text(
                     'Start a conversation by contacting sellers',
@@ -359,7 +373,11 @@ class _ChatListScreenState extends State<ChatListScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.error_outline, size: 64, color: Colors.red),
+                      const Icon(
+                        Icons.error_outline,
+                        size: 64,
+                        color: Colors.red,
+                      ),
                       const SizedBox(height: 16),
                       Text('Error: ${snapshot.error}'),
                       const SizedBox(height: 16),
@@ -381,9 +399,16 @@ class _ChatListScreenState extends State<ChatListScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.chat_bubble_outline, size: 64, color: Colors.grey),
+                      Icon(
+                        Icons.chat_bubble_outline,
+                        size: 64,
+                        color: Colors.grey,
+                      ),
                       SizedBox(height: 16),
-                      Text('No chats yet', style: TextStyle(fontSize: 18, color: Colors.grey)),
+                      Text(
+                        'No chats yet',
+                        style: TextStyle(fontSize: 18, color: Colors.grey),
+                      ),
                       SizedBox(height: 8),
                       Text(
                         'Start a conversation by contacting sellers',

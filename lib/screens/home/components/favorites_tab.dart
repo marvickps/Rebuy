@@ -19,7 +19,10 @@ class _FavoritesTabState extends State<FavoritesTab> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      final favoritesProvider = Provider.of<FavoritesProvider>(context, listen: false);
+      final favoritesProvider = Provider.of<FavoritesProvider>(
+        context,
+        listen: false,
+      );
 
       // Initialize favorites if user is logged in
       if (authProvider.user != null) {
@@ -30,7 +33,10 @@ class _FavoritesTabState extends State<FavoritesTab> {
 
   Future<void> _toggleFavorite(ProductModel product) async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final favoritesProvider = Provider.of<FavoritesProvider>(context, listen: false);
+    final favoritesProvider = Provider.of<FavoritesProvider>(
+      context,
+      listen: false,
+    );
 
     if (authProvider.user == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -59,17 +65,16 @@ class _FavoritesTabState extends State<FavoritesTab> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to remove from favorites: ${favoritesProvider.errorMessage}'),
+            content: Text(
+              'Failed to remove from favorites: ${favoritesProvider.errorMessage}',
+            ),
             backgroundColor: Colors.red,
           ),
         );
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error: $e'),
-          backgroundColor: Colors.red,
-        ),
+        SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
       );
     }
   }
@@ -102,33 +107,48 @@ class _FavoritesTabState extends State<FavoritesTab> {
                 child: Stack(
                   children: [
                     ClipRRect(
-                      borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                      borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(12),
+                      ),
                       child: product.imageUrls.isNotEmpty
                           ? CachedNetworkImage(
-                        imageUrl: product.imageUrls.first,
-                        fit: BoxFit.cover,
-                        width: double.infinity,
-                        height: double.infinity,
-                        placeholder: (context, url) => Container(
-                          color: Colors.grey[200],
-                          child: const Center(child: CircularProgressIndicator()),
-                        ),
-                        errorWidget: (context, url, error) => Container(
-                          color: Colors.grey[200],
-                          child: const Icon(Icons.image_not_supported, size: 50, color: Colors.grey),
-                        ),
-                      )
+                              imageUrl: product.imageUrls.first,
+                              fit: BoxFit.cover,
+                              width: double.infinity,
+                              height: double.infinity,
+                              placeholder: (context, url) => Container(
+                                color: Colors.grey[200],
+                                child: const Center(
+                                  child: CircularProgressIndicator(),
+                                ),
+                              ),
+                              errorWidget: (context, url, error) => Container(
+                                color: Colors.grey[200],
+                                child: const Icon(
+                                  Icons.image_not_supported,
+                                  size: 50,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            )
                           : Container(
-                        color: Colors.grey[200],
-                        child: const Icon(Icons.image_not_supported, size: 50, color: Colors.grey),
-                      ),
+                              color: Colors.grey[200],
+                              child: const Icon(
+                                Icons.image_not_supported,
+                                size: 50,
+                                color: Colors.grey,
+                              ),
+                            ),
                     ),
                     // Category Badge
                     Positioned(
                       top: 8,
                       left: 8,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.black.withOpacity(0.7),
                           borderRadius: BorderRadius.circular(12),
@@ -198,13 +218,17 @@ class _FavoritesTabState extends State<FavoritesTab> {
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
-                        color: Color(0xFF002F34),
+                        color: Color(0xFF078893),
                       ),
                     ),
                     const Spacer(),
                     Row(
                       children: [
-                        const Icon(Icons.location_on_outlined, size: 12, color: Colors.grey),
+                        const Icon(
+                          Icons.location_on_outlined,
+                          size: 12,
+                          color: Colors.grey,
+                        ),
                         const SizedBox(width: 2),
                         Expanded(
                           child: Text(
@@ -256,9 +280,12 @@ class _FavoritesTabState extends State<FavoritesTab> {
                     Navigator.pushNamed(context, '/login');
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF002F34),
+                    backgroundColor: const Color(0xFF078893),
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 32,
+                      vertical: 12,
+                    ),
                   ),
                   child: const Text('Login'),
                 ),
@@ -332,16 +359,20 @@ class _FavoritesTabState extends State<FavoritesTab> {
                 ElevatedButton(
                   onPressed: () {
                     // Switch to home tab (index 0)
-                    final homeScreenState = context.findAncestorStateOfType<State>();
+                    final homeScreenState = context
+                        .findAncestorStateOfType<State>();
                     if (homeScreenState != null && homeScreenState.mounted) {
                       // This is a bit hacky, but we can notify parent to switch tabs
                       Navigator.pushReplacementNamed(context, '/home');
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF002F34),
+                    backgroundColor: const Color(0xFF078893),
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 32,
+                      vertical: 12,
+                    ),
                   ),
                   child: const Text('Browse Products'),
                 ),
@@ -368,7 +399,9 @@ class _FavoritesTabState extends State<FavoritesTab> {
                   const Spacer(),
                   IconButton(
                     onPressed: () {
-                      favoritesProvider.refreshFavorites(authProvider.user!.uid);
+                      favoritesProvider.refreshFavorites(
+                        authProvider.user!.uid,
+                      );
                     },
                     icon: const Icon(Icons.refresh),
                     tooltip: 'Refresh favorites',
@@ -380,7 +413,8 @@ class _FavoritesTabState extends State<FavoritesTab> {
             // Favorites Grid
             Expanded(
               child: RefreshIndicator(
-                onRefresh: () => favoritesProvider.refreshFavorites(authProvider.user!.uid),
+                onRefresh: () =>
+                    favoritesProvider.refreshFavorites(authProvider.user!.uid),
                 child: GridView.builder(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(

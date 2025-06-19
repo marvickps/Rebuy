@@ -60,7 +60,7 @@ class _SignupScreenState extends State<SignupScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF002F34)),
+          icon: const Icon(Icons.arrow_back, color: Color(0xFF078893)),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -78,7 +78,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       width: 80,
                       height: 80,
                       decoration: const BoxDecoration(
-                        color: Color(0xFF002F34),
+                        color: Color(0xFF078893),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
@@ -93,7 +93,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF002F34),
+                        color: Color(0xFF078893),
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -283,7 +283,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       child: const Text(
                         'Sign In',
                         style: TextStyle(
-                          color: Color(0xFF002F34),
+                          color: Color(0xFF078893),
                           fontWeight: FontWeight.w600,
                         ),
                       ),

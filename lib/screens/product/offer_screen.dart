@@ -10,10 +10,7 @@ import '../../providers/auth_provider.dart';
 class MakeOfferScreen extends StatefulWidget {
   final ProductModel product;
 
-  const MakeOfferScreen({
-    super.key,
-    required this.product,
-  });
+  const MakeOfferScreen({super.key, required this.product});
 
   @override
   State<MakeOfferScreen> createState() => _MakeOfferScreenState();
@@ -75,17 +72,16 @@ class _MakeOfferScreenState extends State<MakeOfferScreen> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(offerProvider.errorMessage ?? 'Failed to create offer'),
+            content: Text(
+              offerProvider.errorMessage ?? 'Failed to create offer',
+            ),
             backgroundColor: Colors.red,
           ),
         );
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error: $e'),
-          backgroundColor: Colors.red,
-        ),
+        SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
       );
     } finally {
       setState(() {
@@ -108,7 +104,9 @@ class _MakeOfferScreenState extends State<MakeOfferScreen> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Your offer of ₹${_offerController.text} has been sent to ${widget.product.sellerName}.'),
+            Text(
+              'Your offer of ₹${_offerController.text} has been sent to ${widget.product.sellerName}.',
+            ),
             const SizedBox(height: 8),
             const Text(
               'You will be notified when the seller responds to your offer.',
@@ -134,7 +132,7 @@ class _MakeOfferScreenState extends State<MakeOfferScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Make an Offer'),
-        backgroundColor: const Color(0xFF002F34),
+        backgroundColor: const Color(0xFF078893),
         foregroundColor: Colors.white,
       ),
       body: SingleChildScrollView(
@@ -155,25 +153,31 @@ class _MakeOfferScreenState extends State<MakeOfferScreen> {
                         borderRadius: BorderRadius.circular(8),
                         child: widget.product.imageUrls.isNotEmpty
                             ? Image.network(
-                          widget.product.imageUrls.first,
-                          width: 80,
-                          height: 80,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Container(
-                              width: 80,
-                              height: 80,
-                              color: Colors.grey[200],
-                              child: const Icon(LucideIcons.image, color: Colors.grey),
-                            );
-                          },
-                        )
+                                widget.product.imageUrls.first,
+                                width: 80,
+                                height: 80,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    width: 80,
+                                    height: 80,
+                                    color: Colors.grey[200],
+                                    child: const Icon(
+                                      LucideIcons.image,
+                                      color: Colors.grey,
+                                    ),
+                                  );
+                                },
+                              )
                             : Container(
-                          width: 80,
-                          height: 80,
-                          color: Colors.grey[200],
-                          child: const Icon(LucideIcons.image, color: Colors.grey),
-                        ),
+                                width: 80,
+                                height: 80,
+                                color: Colors.grey[200],
+                                child: const Icon(
+                                  LucideIcons.image,
+                                  color: Colors.grey,
+                                ),
+                              ),
                       ),
                       const SizedBox(width: 16),
                       // Product Details
@@ -196,7 +200,7 @@ class _MakeOfferScreenState extends State<MakeOfferScreen> {
                               style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
-                                color: Color(0xFF002F34),
+                                color: Color(0xFF078893),
                               ),
                             ),
                             const SizedBox(height: 4),
@@ -219,18 +223,13 @@ class _MakeOfferScreenState extends State<MakeOfferScreen> {
               // Offer Amount Section
               const Text(
                 'Your Offer Amount',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               TextFormField(
                 controller: _offerController,
                 keyboardType: TextInputType.number,
-                inputFormatters: [
-                  FilteringTextInputFormatter.digitsOnly,
-                ],
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 decoration: const InputDecoration(
                   labelText: 'Enter your offer amount',
                   prefixText: '₹ ',
@@ -261,7 +260,11 @@ class _MakeOfferScreenState extends State<MakeOfferScreen> {
                   padding: const EdgeInsets.only(top: 8),
                   child: Row(
                     children: [
-                      Icon(LucideIcons.trendingDown, size: 16, color: Colors.green[600]),
+                      Icon(
+                        LucideIcons.trendingDown,
+                        size: 16,
+                        color: Colors.green[600],
+                      ),
                       const SizedBox(width: 4),
                       Text(
                         'Discount: ${_calculateDiscount(widget.product.price, double.tryParse(_offerController.text) ?? 0)}',
@@ -279,10 +282,7 @@ class _MakeOfferScreenState extends State<MakeOfferScreen> {
               // Message Section
               const Text(
                 'Message (Optional)',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               TextFormField(
@@ -292,7 +292,8 @@ class _MakeOfferScreenState extends State<MakeOfferScreen> {
                 decoration: const InputDecoration(
                   labelText: 'Add a message to your offer',
                   border: OutlineInputBorder(),
-                  hintText: 'e.g., I can pick up immediately, or explain why you\'re interested...',
+                  hintText:
+                      'e.g., I can pick up immediately, or explain why you\'re interested...',
                   alignLabelWithHint: true,
                 ),
               ),
@@ -308,7 +309,11 @@ class _MakeOfferScreenState extends State<MakeOfferScreen> {
                     children: [
                       Row(
                         children: [
-                          Icon(LucideIcons.info, color: Colors.blue[700], size: 20),
+                          Icon(
+                            LucideIcons.info,
+                            color: Colors.blue[700],
+                            size: 20,
+                          ),
                           const SizedBox(width: 8),
                           Text(
                             'Important Information',
@@ -322,9 +327,13 @@ class _MakeOfferScreenState extends State<MakeOfferScreen> {
                       ),
                       const SizedBox(height: 12),
                       _buildInfoPoint('• Your offer will be valid for 7 days'),
-                      _buildInfoPoint('• The seller can accept, reject, or counter your offer'),
+                      _buildInfoPoint(
+                        '• The seller can accept, reject, or counter your offer',
+                      ),
                       _buildInfoPoint('• You\'ll be notified of any response'),
-                      _buildInfoPoint('• You can only have one active offer per product'),
+                      _buildInfoPoint(
+                        '• You can only have one active offer per product',
+                      ),
                     ],
                   ),
                 ),
@@ -337,22 +346,27 @@ class _MakeOfferScreenState extends State<MakeOfferScreen> {
                 child: ElevatedButton(
                   onPressed: _isLoading ? null : _submitOffer,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF002F34),
+                    backgroundColor: const Color(0xFF078893),
                     padding: const EdgeInsets.symmetric(vertical: 16),
                   ),
                   child: _isLoading
                       ? const SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                    ),
-                  )
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.white,
+                            ),
+                          ),
+                        )
                       : const Text(
-                    'Send Offer',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
+                          'Send Offer',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                 ),
               ),
             ],
@@ -367,10 +381,7 @@ class _MakeOfferScreenState extends State<MakeOfferScreen> {
       padding: const EdgeInsets.only(bottom: 4),
       child: Text(
         text,
-        style: TextStyle(
-          fontSize: 14,
-          color: Colors.blue[700],
-        ),
+        style: TextStyle(fontSize: 14, color: Colors.blue[700]),
       ),
     );
   }

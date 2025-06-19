@@ -4,7 +4,6 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../models/product_model.dart';
 
-
 class ProductCard extends StatelessWidget {
   final ProductModel product;
   final VoidCallback? onTap;
@@ -47,9 +46,7 @@ class ProductCard extends StatelessWidget {
       height: height,
       child: Card(
         elevation: 2,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(12),
@@ -75,37 +72,37 @@ class ProductCard extends StatelessWidget {
                         ),
                         child: product.imageUrls.isNotEmpty
                             ? CachedNetworkImage(
-                          imageUrl: product.imageUrls.first,
-                          fit: BoxFit.cover,
-                          placeholder: (context, url) => Container(
-                            color: Colors.grey[200],
-                            child: const Center(
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                              ),
-                            ),
-                          ),
-                          errorWidget: (context, url, error) => Container(
-                            color: Colors.grey[200],
-                            child: const Center(
-                              child: Icon(
-                                LucideIcons.image,
-                                size: 32,
-                                color: Colors.grey,
-                              ),
-                            ),
-                          ),
-                        )
+                                imageUrl: product.imageUrls.first,
+                                fit: BoxFit.cover,
+                                placeholder: (context, url) => Container(
+                                  color: Colors.grey[200],
+                                  child: const Center(
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  ),
+                                ),
+                                errorWidget: (context, url, error) => Container(
+                                  color: Colors.grey[200],
+                                  child: const Center(
+                                    child: Icon(
+                                      LucideIcons.image,
+                                      size: 32,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ),
+                              )
                             : Container(
-                          color: Colors.grey[200],
-                          child: const Center(
-                            child: Icon(
-                              LucideIcons.image,
-                              size: 32,
-                              color: Colors.grey,
-                            ),
-                          ),
-                        ),
+                                color: Colors.grey[200],
+                                child: const Center(
+                                  child: Icon(
+                                    LucideIcons.image,
+                                    size: 32,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ),
                       ),
                     ),
 
@@ -130,7 +127,9 @@ class ProductCard extends StatelessWidget {
                               ],
                             ),
                             child: Icon(
-                              isFavorite ? LucideIcons.heart : LucideIcons.heart,
+                              isFavorite
+                                  ? LucideIcons.heart
+                                  : LucideIcons.heart,
                               size: 16,
                               color: isFavorite ? Colors.red : Colors.grey,
                             ),
@@ -215,7 +214,7 @@ class ProductCard extends StatelessWidget {
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF002F34),
+                          color: Color(0xFF078893),
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -331,9 +330,7 @@ class CompactProductCard extends StatelessWidget {
     return Card(
       elevation: 1,
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(8),
@@ -353,26 +350,26 @@ class CompactProductCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                   child: product.imageUrls.isNotEmpty
                       ? CachedNetworkImage(
-                    imageUrl: product.imageUrls.first,
-                    fit: BoxFit.cover,
-                    placeholder: (context, url) => const Center(
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    ),
-                    errorWidget: (context, url, error) => const Center(
-                      child: Icon(
-                        LucideIcons.image,
-                        size: 24,
-                        color: Colors.grey,
-                      ),
-                    ),
-                  )
+                          imageUrl: product.imageUrls.first,
+                          fit: BoxFit.cover,
+                          placeholder: (context, url) => const Center(
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                          errorWidget: (context, url, error) => const Center(
+                            child: Icon(
+                              LucideIcons.image,
+                              size: 24,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        )
                       : const Center(
-                    child: Icon(
-                      LucideIcons.image,
-                      size: 24,
-                      color: Colors.grey,
-                    ),
-                  ),
+                          child: Icon(
+                            LucideIcons.image,
+                            size: 24,
+                            color: Colors.grey,
+                          ),
+                        ),
                 ),
               ),
               const SizedBox(width: 12),
@@ -400,7 +397,7 @@ class CompactProductCard extends StatelessWidget {
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF002F34),
+                        color: Color(0xFF078893),
                       ),
                     ),
                     const SizedBox(height: 8),

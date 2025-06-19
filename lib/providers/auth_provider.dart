@@ -48,6 +48,12 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
+  // Add this method to update the user model locally
+  void updateUserModel(UserModel updatedUser) {
+    _userModel = updatedUser;
+    notifyListeners();
+  }
+
   Future<bool> signUp({
     required String name,
     required String email,
@@ -296,14 +302,14 @@ class AuthProvider extends ChangeNotifier {
         return 'The password provided is too weak.';
       case 'email-already-in-use':
         return 'An account already exists for this email.';
-      case 'user-not-found':
-        return 'No user found for this email.';
-      case 'wrong-password':
-        return 'Wrong password provided.';
       case 'invalid-email':
         return 'The email address is not valid.';
       case 'user-disabled':
         return 'This user account has been disabled.';
+      case 'user-not-found':
+        return 'No user found for this email.';
+      case 'wrong-password':
+        return 'Wrong password provided.';
       case 'too-many-requests':
         return 'Too many requests. Please try again later.';
       default:

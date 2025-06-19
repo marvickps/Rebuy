@@ -8,6 +8,12 @@ class UserModel {
   final List<String> favorites;
   final bool isOnline;
   final DateTime? lastSeen;
+  final String upiId;
+  final String address;
+  final String city;
+  final String state;
+  final String pincode;
+  final String bio;
 
   UserModel({
     required this.uid,
@@ -19,6 +25,12 @@ class UserModel {
     this.favorites = const [],
     this.isOnline = false,
     this.lastSeen,
+    this.upiId = '',
+    this.address = '',
+    this.city = '',
+    this.state = '',
+    this.pincode = '',
+    this.bio = '',
   });
 
   Map<String, dynamic> toMap() {
@@ -32,6 +44,12 @@ class UserModel {
       'favorites': favorites,
       'isOnline': isOnline,
       'lastSeen': lastSeen?.toIso8601String(),
+      'upiId': upiId,
+      'address': address,
+      'city': city,
+      'state': state,
+      'pincode': pincode,
+      'bio': bio,
     };
   }
 
@@ -46,6 +64,12 @@ class UserModel {
       favorites: List<String>.from(map['favorites'] ?? []),
       isOnline: map['isOnline'] ?? false,
       lastSeen: map['lastSeen'] != null ? DateTime.parse(map['lastSeen']) : null,
+      upiId: map['upiId'] ?? '',
+      address: map['address'] ?? '',
+      city: map['city'] ?? '',
+      state: map['state'] ?? '',
+      pincode: map['pincode'] ?? '',
+      bio: map['bio'] ?? '',
     );
   }
 
@@ -57,6 +81,12 @@ class UserModel {
     List<String>? favorites,
     bool? isOnline,
     DateTime? lastSeen,
+    String? upiId,
+    String? address,
+    String? city,
+    String? state,
+    String? pincode,
+    String? bio,
   }) {
     return UserModel(
       uid: uid,
@@ -68,6 +98,24 @@ class UserModel {
       favorites: favorites ?? this.favorites,
       isOnline: isOnline ?? this.isOnline,
       lastSeen: lastSeen ?? this.lastSeen,
+      upiId: upiId ?? this.upiId,
+      address: address ?? this.address,
+      city: city ?? this.city,
+      state: state ?? this.state,
+      pincode: pincode ?? this.pincode,
+      bio: bio ?? this.bio,
     );
+  }
+
+  String get fullAddress {
+    if (address.isEmpty && city.isEmpty && state.isEmpty) return '';
+
+    List<String> addressParts = [];
+    if (address.isNotEmpty) addressParts.add(address);
+    if (city.isNotEmpty) addressParts.add(city);
+    if (state.isNotEmpty) addressParts.add(state);
+    if (pincode.isNotEmpty) addressParts.add(pincode);
+
+    return addressParts.join(', ');
   }
 }

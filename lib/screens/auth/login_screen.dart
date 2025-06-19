@@ -54,7 +54,7 @@ class _LoginScreenState extends State<LoginScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 40),
-              
+
               // Header
               Center(
                 child: Column(
@@ -63,7 +63,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       width: 80,
                       height: 80,
                       decoration: const BoxDecoration(
-                        color: Color(0xFF002F34),
+                        color: Color(0xFF078893),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
@@ -78,23 +78,20 @@ class _LoginScreenState extends State<LoginScreen> {
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF002F34),
+                        color: Color(0xFF078893),
                       ),
                     ),
                     const SizedBox(height: 8),
                     const Text(
                       'Sign in to continue to Rebuy',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.grey,
-                      ),
+                      style: TextStyle(fontSize: 16, color: Colors.grey),
                     ),
                   ],
                 ),
               ),
-              
+
               const SizedBox(height: 40),
-              
+
               // Form
               Form(
                 key: _formKey,
@@ -112,14 +109,16 @@ class _LoginScreenState extends State<LoginScreen> {
                         if (value == null || value.isEmpty) {
                           return 'Please enter your email';
                         }
-                        if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                        if (!RegExp(
+                          r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                        ).hasMatch(value)) {
                           return 'Please enter a valid email';
                         }
                         return null;
                       },
                     ),
                     const SizedBox(height: 20),
-                    
+
                     // Password Field
                     TextFormField(
                       controller: _passwordController,
@@ -129,7 +128,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         prefixIcon: const Icon(Icons.lock_outlined),
                         suffixIcon: IconButton(
                           icon: Icon(
-                            _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                            _obscurePassword
+                                ? Icons.visibility_outlined
+                                : Icons.visibility_off_outlined,
                           ),
                           onPressed: () {
                             setState(() {
@@ -149,7 +150,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       },
                     ),
                     const SizedBox(height: 30),
-                    
+
                     // Login Button
                     Consumer<AuthProvider>(
                       builder: (context, authProvider, child) {
@@ -159,10 +160,15 @@ class _LoginScreenState extends State<LoginScreen> {
                           child: ElevatedButton(
                             onPressed: authProvider.isLoading ? null : _login,
                             child: authProvider.isLoading
-                                ? const CircularProgressIndicator(color: Colors.white)
+                                ? const CircularProgressIndicator(
+                                    color: Colors.white,
+                                  )
                                 : const Text(
                                     'Sign In',
-                                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
                                   ),
                           ),
                         );
@@ -171,9 +177,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   ],
                 ),
               ),
-              
+
               const SizedBox(height: 30),
-              
+
               // Sign Up Link
               Center(
                 child: Row(
@@ -190,7 +196,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: const Text(
                         'Sign Up',
                         style: TextStyle(
-                          color: Color(0xFF002F34),
+                          color: Color(0xFF078893),
                           fontWeight: FontWeight.w600,
                         ),
                       ),

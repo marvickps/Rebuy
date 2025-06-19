@@ -19,7 +19,10 @@ class _MyListingScreenState extends State<MyListingScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      final productProvider = Provider.of<ProductProvider>(context, listen: false);
+      final productProvider = Provider.of<ProductProvider>(
+        context,
+        listen: false,
+      );
 
       if (authProvider.user != null) {
         productProvider.loadMyProducts(authProvider.user!.uid);
@@ -48,11 +51,14 @@ class _MyListingScreenState extends State<MyListingScreen> {
     );
 
     if (confirmed == true) {
-      final productProvider = Provider.of<ProductProvider>(context, listen: false);
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Deleting product...')),
+      final productProvider = Provider.of<ProductProvider>(
+        context,
+        listen: false,
       );
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Deleting product...')));
 
       final success = await productProvider.deleteProduct(product.id);
 
@@ -66,7 +72,9 @@ class _MyListingScreenState extends State<MyListingScreen> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to delete product: ${productProvider.errorMessage}'),
+            content: Text(
+              'Failed to delete product: ${productProvider.errorMessage}',
+            ),
             backgroundColor: Colors.red,
           ),
         );
@@ -75,11 +83,12 @@ class _MyListingScreenState extends State<MyListingScreen> {
   }
 
   Future<void> _toggleAvailability(ProductModel product) async {
-    final productProvider = Provider.of<ProductProvider>(context, listen: false);
-
-    final updatedProduct = product.copyWith(
-      isAvailable: !product.isAvailable,
+    final productProvider = Provider.of<ProductProvider>(
+      context,
+      listen: false,
     );
+
+    final updatedProduct = product.copyWith(isAvailable: !product.isAvailable);
 
     final success = await productProvider.updateProduct(updatedProduct);
 
@@ -97,7 +106,9 @@ class _MyListingScreenState extends State<MyListingScreen> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Failed to update product: ${productProvider.errorMessage}'),
+          content: Text(
+            'Failed to update product: ${productProvider.errorMessage}',
+          ),
           backgroundColor: Colors.red,
         ),
       );
@@ -132,25 +143,29 @@ class _MyListingScreenState extends State<MyListingScreen> {
                   height: 80,
                   child: product.imageUrls.isNotEmpty
                       ? CachedNetworkImage(
-                    imageUrl: product.imageUrls.first,
-                    fit: BoxFit.cover,
-                    placeholder: (context, url) => Container(
-                      color: Colors.grey[200],
-                      child: const Center(
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      ),
-                    ),
-                    errorWidget: (context, url, error) => Container(
-                      color: Colors.grey[200],
-                      child: const Icon(Icons.image_not_supported,
-                          color: Colors.grey),
-                    ),
-                  )
+                          imageUrl: product.imageUrls.first,
+                          fit: BoxFit.cover,
+                          placeholder: (context, url) => Container(
+                            color: Colors.grey[200],
+                            child: const Center(
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                          ),
+                          errorWidget: (context, url, error) => Container(
+                            color: Colors.grey[200],
+                            child: const Icon(
+                              Icons.image_not_supported,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        )
                       : Container(
-                    color: Colors.grey[200],
-                    child: const Icon(Icons.image_not_supported,
-                        color: Colors.grey),
-                  ),
+                          color: Colors.grey[200],
+                          child: const Icon(
+                            Icons.image_not_supported,
+                            color: Colors.grey,
+                          ),
+                        ),
                 ),
               ),
 
@@ -176,7 +191,9 @@ class _MyListingScreenState extends State<MyListingScreen> {
                         ),
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 4),
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
                           decoration: BoxDecoration(
                             color: product.isAvailable
                                 ? Colors.green.withOpacity(0.1)
@@ -186,7 +203,9 @@ class _MyListingScreenState extends State<MyListingScreen> {
                           child: Text(
                             product.isAvailable ? 'Available' : 'Sold',
                             style: TextStyle(
-                              color: product.isAvailable ? Colors.green : Colors.red,
+                              color: product.isAvailable
+                                  ? Colors.green
+                                  : Colors.red,
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
                             ),
@@ -202,7 +221,7 @@ class _MyListingScreenState extends State<MyListingScreen> {
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 18,
-                        color: Color(0xFF002F34),
+                        color: Color(0xFF078893),
                       ),
                     ),
 
@@ -212,22 +231,34 @@ class _MyListingScreenState extends State<MyListingScreen> {
                       children: [
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 6, vertical: 2),
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.grey[200],
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
                             product.categoryDisplayName,
-                            style: const TextStyle(fontSize: 10, color: Colors.grey),
+                            style: const TextStyle(
+                              fontSize: 10,
+                              color: Colors.grey,
+                            ),
                           ),
                         ),
                         const SizedBox(width: 8),
-                        const Icon(Icons.visibility, size: 12, color: Colors.grey),
+                        const Icon(
+                          Icons.visibility,
+                          size: 12,
+                          color: Colors.grey,
+                        ),
                         const SizedBox(width: 2),
                         Text(
                           '${product.views}',
-                          style: const TextStyle(fontSize: 12, color: Colors.grey),
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey,
+                          ),
                         ),
                       ],
                     ),
@@ -236,20 +267,29 @@ class _MyListingScreenState extends State<MyListingScreen> {
 
                     Row(
                       children: [
-                        const Icon(Icons.location_on_outlined,
-                            size: 12, color: Colors.grey),
+                        const Icon(
+                          Icons.location_on_outlined,
+                          size: 12,
+                          color: Colors.grey,
+                        ),
                         const SizedBox(width: 2),
                         Expanded(
                           child: Text(
                             product.location,
-                            style: const TextStyle(fontSize: 12, color: Colors.grey),
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey,
+                            ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
                         Text(
                           _formatDate(product.createdAt),
-                          style: const TextStyle(fontSize: 12, color: Colors.grey),
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey,
+                          ),
                         ),
                       ],
                     ),
@@ -275,11 +315,17 @@ class _MyListingScreenState extends State<MyListingScreen> {
                     child: Row(
                       children: [
                         Icon(
-                          product.isAvailable ? Icons.visibility_off : Icons.visibility,
+                          product.isAvailable
+                              ? Icons.visibility_off
+                              : Icons.visibility,
                           size: 18,
                         ),
                         const SizedBox(width: 8),
-                        Text(product.isAvailable ? 'Mark as Sold' : 'Mark as Available'),
+                        Text(
+                          product.isAvailable
+                              ? 'Mark as Sold'
+                              : 'Mark as Available',
+                        ),
                       ],
                     ),
                   ),
@@ -366,7 +412,10 @@ class _MyListingScreenState extends State<MyListingScreen> {
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () {
-                      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+                      final authProvider = Provider.of<AuthProvider>(
+                        context,
+                        listen: false,
+                      );
                       if (authProvider.user != null) {
                         productProvider.loadMyProducts(authProvider.user!.uid);
                       }
@@ -383,7 +432,11 @@ class _MyListingScreenState extends State<MyListingScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.inventory_outlined, size: 64, color: Colors.grey),
+                  const Icon(
+                    Icons.inventory_outlined,
+                    size: 64,
+                    color: Colors.grey,
+                  ),
                   const SizedBox(height: 16),
                   const Text(
                     'No listings yet',
@@ -402,7 +455,7 @@ class _MyListingScreenState extends State<MyListingScreen> {
                     icon: const Icon(Icons.add),
                     label: const Text('Add Product'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF002F34),
+                      backgroundColor: const Color(0xFF078893),
                       foregroundColor: Colors.white,
                     ),
                   ),
@@ -413,7 +466,10 @@ class _MyListingScreenState extends State<MyListingScreen> {
 
           return RefreshIndicator(
             onRefresh: () async {
-              final authProvider = Provider.of<AuthProvider>(context, listen: false);
+              final authProvider = Provider.of<AuthProvider>(
+                context,
+                listen: false,
+              );
               if (authProvider.user != null) {
                 await productProvider.loadMyProducts(authProvider.user!.uid);
               }
@@ -425,7 +481,7 @@ class _MyListingScreenState extends State<MyListingScreen> {
                   margin: const EdgeInsets.all(16),
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF002F34),
+                    color: const Color(0xFF078893),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Row(
@@ -443,7 +499,10 @@ class _MyListingScreenState extends State<MyListingScreen> {
                           ),
                           const Text(
                             'Total Listings',
-                            style: TextStyle(color: Colors.white70, fontSize: 12),
+                            style: TextStyle(
+                              color: Colors.white70,
+                              fontSize: 12,
+                            ),
                           ),
                         ],
                       ),
@@ -459,7 +518,10 @@ class _MyListingScreenState extends State<MyListingScreen> {
                           ),
                           const Text(
                             'Available',
-                            style: TextStyle(color: Colors.white70, fontSize: 12),
+                            style: TextStyle(
+                              color: Colors.white70,
+                              fontSize: 12,
+                            ),
                           ),
                         ],
                       ),
@@ -475,7 +537,10 @@ class _MyListingScreenState extends State<MyListingScreen> {
                           ),
                           const Text(
                             'Sold',
-                            style: TextStyle(color: Colors.white70, fontSize: 12),
+                            style: TextStyle(
+                              color: Colors.white70,
+                              fontSize: 12,
+                            ),
                           ),
                         ],
                       ),

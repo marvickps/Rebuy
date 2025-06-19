@@ -24,8 +24,14 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      final productProvider = Provider.of<ProductProvider>(context, listen: false);
-      final favoritesProvider = Provider.of<FavoritesProvider>(context, listen: false);
+      final productProvider = Provider.of<ProductProvider>(
+        context,
+        listen: false,
+      );
+      final favoritesProvider = Provider.of<FavoritesProvider>(
+        context,
+        listen: false,
+      );
 
       // Load products
       productProvider.loadProducts();
@@ -51,27 +57,16 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: const Text('Rebuy'),
         automaticallyImplyLeading: false,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_outlined),
-            onPressed: () {
-              // Handle notifications
-            },
-          ),
-        ],
       ),
-      body: IndexedStack(
-        index: _currentIndex,
-        children: pages,
-      ),
+      body: IndexedStack(index: _currentIndex, children: pages),
       floatingActionButton: _currentIndex == 0
           ? FloatingActionButton(
-        onPressed: () {
-          Navigator.pushNamed(context, '/add-product');
-        },
-        backgroundColor: const Color(0xFF002F34),
-        child: const Icon(Icons.add, color: Colors.white),
-      )
+              onPressed: () {
+                Navigator.pushNamed(context, '/add-product');
+              },
+              backgroundColor: const Color(0xFF078893),
+              child: const Icon(Icons.add, color: Colors.white),
+            )
           : null,
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
@@ -81,7 +76,7 @@ class _HomeScreenState extends State<HomeScreen> {
             _currentIndex = index;
           });
         },
-        selectedItemColor: const Color(0xFF002F34),
+        selectedItemColor: const Color(0xFF078893),
         unselectedItemColor: Colors.grey,
         items: const [
           BottomNavigationBarItem(

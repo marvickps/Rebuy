@@ -31,7 +31,10 @@ class _HomeTabState extends State<HomeTab> {
   }
 
   void _onLocationFilter(String location) {
-    Provider.of<ProductProvider>(context, listen: false).filterByLocation(location);
+    Provider.of<ProductProvider>(
+      context,
+      listen: false,
+    ).filterByLocation(location);
   }
 
   void _clearAllFilters() {
@@ -45,7 +48,10 @@ class _HomeTabState extends State<HomeTab> {
 
   Future<void> _toggleFavorite(ProductModel product) async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final favoritesProvider = Provider.of<FavoritesProvider>(context, listen: false);
+    final favoritesProvider = Provider.of<FavoritesProvider>(
+      context,
+      listen: false,
+    );
 
     if (authProvider.user == null) {
       // Show login prompt
@@ -79,17 +85,16 @@ class _HomeTabState extends State<HomeTab> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to update favorites: ${favoritesProvider.errorMessage}'),
+            content: Text(
+              'Failed to update favorites: ${favoritesProvider.errorMessage}',
+            ),
             backgroundColor: Colors.red,
           ),
         );
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error: $e'),
-          backgroundColor: Colors.red,
-        ),
+        SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
       );
     }
   }
@@ -108,7 +113,7 @@ class _HomeTabState extends State<HomeTab> {
                   borderRadius: BorderRadius.circular(25),
                   border: Border.all(
                     color: productProvider.searchQuery.isNotEmpty
-                        ? const Color(0xFF002F34)
+                        ? const Color(0xFF078893)
                         : Colors.transparent,
                     width: 1,
                   ),
@@ -131,7 +136,9 @@ class _HomeTabState extends State<HomeTab> {
                           ),
                         IconButton(
                           icon: Icon(
-                            _isSearchExpanded ? Icons.expand_less : Icons.expand_more,
+                            _isSearchExpanded
+                                ? Icons.expand_less
+                                : Icons.expand_more,
                             color: Colors.grey,
                           ),
                           onPressed: () {
@@ -143,7 +150,10 @@ class _HomeTabState extends State<HomeTab> {
                       ],
                     ),
                     border: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 14,
+                    ),
                   ),
                 ),
               ),
@@ -164,7 +174,10 @@ class _HomeTabState extends State<HomeTab> {
                       // Location Filter
                       const Text(
                         'Filter by Location',
-                        style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                        ),
                       ),
                       const SizedBox(height: 8),
                       Container(
@@ -177,18 +190,24 @@ class _HomeTabState extends State<HomeTab> {
                           onChanged: _onLocationFilter,
                           decoration: InputDecoration(
                             hintText: 'Enter city or area...',
-                            prefixIcon: const Icon(Icons.location_on_outlined, size: 20),
+                            prefixIcon: const Icon(
+                              Icons.location_on_outlined,
+                              size: 20,
+                            ),
                             suffixIcon: productProvider.selectedLocation != null
                                 ? IconButton(
-                              icon: const Icon(Icons.clear, size: 20),
-                              onPressed: () {
-                                _locationController.clear();
-                                _onLocationFilter('');
-                              },
-                            )
+                                    icon: const Icon(Icons.clear, size: 20),
+                                    onPressed: () {
+                                      _locationController.clear();
+                                      _onLocationFilter('');
+                                    },
+                                  )
                                 : null,
                             border: InputBorder.none,
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 12,
+                            ),
                           ),
                         ),
                       ),
@@ -199,7 +218,10 @@ class _HomeTabState extends State<HomeTab> {
                       if (productProvider.hasActiveFilters) ...[
                         const Text(
                           'Active Filters',
-                          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                          ),
                         ),
                         const SizedBox(height: 8),
                         Wrap(
@@ -209,7 +231,7 @@ class _HomeTabState extends State<HomeTab> {
                             if (productProvider.searchQuery.isNotEmpty)
                               _buildFilterChip(
                                 'Search: "${productProvider.searchQuery}"',
-                                    () {
+                                () {
                                   _searchController.clear();
                                   _onSearch('');
                                 },
@@ -217,12 +239,12 @@ class _HomeTabState extends State<HomeTab> {
                             if (productProvider.selectedCategory != null)
                               _buildFilterChip(
                                 'Category: ${productProvider.selectedCategory!.displayName}',
-                                    () => productProvider.filterByCategory(null),
+                                () => productProvider.filterByCategory(null),
                               ),
                             if (productProvider.selectedLocation != null)
                               _buildFilterChip(
                                 'Location: ${productProvider.selectedLocation}',
-                                    () {
+                                () {
                                   _locationController.clear();
                                   _onLocationFilter('');
                                 },
@@ -235,10 +257,7 @@ class _HomeTabState extends State<HomeTab> {
                       const SizedBox(height: 12),
                       Text(
                         '${productProvider.products.length} products found',
-                        style: TextStyle(
-                          color: Colors.grey[600],
-                          fontSize: 12,
-                        ),
+                        style: TextStyle(color: Colors.grey[600], fontSize: 12),
                       ),
                     ],
                   ),
@@ -255,9 +274,9 @@ class _HomeTabState extends State<HomeTab> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: const Color(0xFF002F34).withOpacity(0.1),
+        color: const Color(0xFF078893).withOpacity(0.1),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFF002F34).withOpacity(0.3)),
+        border: Border.all(color: const Color(0xFF078893).withOpacity(0.3)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -266,18 +285,14 @@ class _HomeTabState extends State<HomeTab> {
             label,
             style: const TextStyle(
               fontSize: 12,
-              color: Color(0xFF002F34),
+              color: Color(0xFF078893),
               fontWeight: FontWeight.w500,
             ),
           ),
           const SizedBox(width: 4),
           GestureDetector(
             onTap: onRemove,
-            child: const Icon(
-              Icons.close,
-              size: 16,
-              color: Color(0xFF002F34),
-            ),
+            child: const Icon(Icons.close, size: 16, color: Color(0xFF078893)),
           ),
         ],
       ),
@@ -303,7 +318,7 @@ class _HomeTabState extends State<HomeTab> {
                     onSelected: (selected) {
                       productProvider.filterByCategory(null);
                     },
-                    selectedColor: const Color(0xFF002F34),
+                    selectedColor: const Color(0xFF078893),
                     checkmarkColor: Colors.white,
                     labelStyle: TextStyle(
                       color: productProvider.selectedCategory == null
@@ -324,9 +339,11 @@ class _HomeTabState extends State<HomeTab> {
                   label: Text(category.displayName),
                   selected: productProvider.selectedCategory == category,
                   onSelected: (selected) {
-                    productProvider.filterByCategory(selected ? category : null);
+                    productProvider.filterByCategory(
+                      selected ? category : null,
+                    );
                   },
-                  selectedColor: const Color(0xFF002F34),
+                  selectedColor: const Color(0xFF078893),
                   checkmarkColor: Colors.white,
                   labelStyle: TextStyle(
                     color: productProvider.selectedCategory == category
@@ -370,7 +387,10 @@ class _HomeTabState extends State<HomeTab> {
                 const SizedBox(height: 16),
                 Text(
                   'Error loading products',
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 Text(
@@ -448,13 +468,16 @@ class _HomeTabState extends State<HomeTab> {
 
         return Card(
           elevation: 2,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
           child: InkWell(
             onTap: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => ProductDetailScreen(productId: product.id),
+                  builder: (context) =>
+                      ProductDetailScreen(productId: product.id),
                 ),
               );
             },
@@ -468,38 +491,56 @@ class _HomeTabState extends State<HomeTab> {
                   child: Container(
                     width: double.infinity,
                     decoration: const BoxDecoration(
-                      borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+                      borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(12),
+                      ),
                     ),
                     child: Stack(
                       children: [
                         ClipRRect(
-                          borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                          borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(12),
+                          ),
                           child: product.imageUrls.isNotEmpty
                               ? CachedNetworkImage(
-                            imageUrl: product.imageUrls.first,
-                            fit: BoxFit.cover,
-                            width: double.infinity,
-                            height: double.infinity,
-                            placeholder: (context, url) => Container(
-                              color: Colors.grey[200],
-                              child: const Center(child: CircularProgressIndicator()),
-                            ),
-                            errorWidget: (context, url, error) => Container(
-                              color: Colors.grey[200],
-                              child: const Icon(Icons.image_not_supported, size: 50, color: Colors.grey),
-                            ),
-                          )
+                                  imageUrl: product.imageUrls.first,
+                                  fit: BoxFit.cover,
+                                  width: double.infinity,
+                                  height: double.infinity,
+                                  placeholder: (context, url) => Container(
+                                    color: Colors.grey[200],
+                                    child: const Center(
+                                      child: CircularProgressIndicator(),
+                                    ),
+                                  ),
+                                  errorWidget: (context, url, error) =>
+                                      Container(
+                                        color: Colors.grey[200],
+                                        child: const Icon(
+                                          Icons.image_not_supported,
+                                          size: 50,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                )
                               : Container(
-                            color: Colors.grey[200],
-                            child: const Icon(Icons.image_not_supported, size: 50, color: Colors.grey),
-                          ),
+                                  color: Colors.grey[200],
+                                  child: const Icon(
+                                    Icons.image_not_supported,
+                                    size: 50,
+                                    color: Colors.grey,
+                                  ),
+                                ),
                         ),
                         // Category Badge
                         Positioned(
                           top: 8,
                           left: 8,
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
                             decoration: BoxDecoration(
                               color: Colors.black.withOpacity(0.7),
                               borderRadius: BorderRadius.circular(12),
@@ -534,8 +575,12 @@ class _HomeTabState extends State<HomeTab> {
                                 ],
                               ),
                               child: Icon(
-                                isFavorite ? Icons.favorite : Icons.favorite_border,
-                                color: isFavorite ? Colors.red : Colors.grey[600],
+                                isFavorite
+                                    ? Icons.favorite
+                                    : Icons.favorite_border,
+                                color: isFavorite
+                                    ? Colors.red
+                                    : Colors.grey[600],
                                 size: 18,
                               ),
                             ),
@@ -569,13 +614,17 @@ class _HomeTabState extends State<HomeTab> {
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
-                            color: Color(0xFF002F34),
+                            color: Color(0xFF078893),
                           ),
                         ),
                         const Spacer(),
                         Row(
                           children: [
-                            const Icon(Icons.location_on_outlined, size: 12, color: Colors.grey),
+                            const Icon(
+                              Icons.location_on_outlined,
+                              size: 12,
+                              color: Colors.grey,
+                            ),
                             const SizedBox(width: 2),
                             Expanded(
                               child: Text(

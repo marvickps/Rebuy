@@ -23,11 +23,7 @@ class ProductDetailScreen extends StatefulWidget {
   final String productId;
   final ProductModel? product; // Optional, for faster loading
 
-  const ProductDetailScreen({
-    super.key,
-    required this.productId,
-    this.product,
-  });
+  const ProductDetailScreen({super.key, required this.productId, this.product});
 
   @override
   State<ProductDetailScreen> createState() => _ProductDetailScreenState();
@@ -49,7 +45,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   }
 
   Future<void> _loadProductDetails() async {
-    final productProvider = Provider.of<ProductProvider>(context, listen: false);
+    final productProvider = Provider.of<ProductProvider>(
+      context,
+      listen: false,
+    );
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final offerProvider = Provider.of<OfferProvider>(context, listen: false);
     setState(() {
@@ -71,7 +70,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         // Check if product is in favorites
         if (authProvider.userModel != null) {
           setState(() {
-            _isFavorite = authProvider.userModel!.favorites.contains(product!.id);
+            _isFavorite = authProvider.userModel!.favorites.contains(
+              product!.id,
+            );
           });
         }
 
@@ -121,6 +122,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       }
     }
   }
+
   Future<void> _checkExistingOffer(String userId, String productId) async {
     final offerProvider = Provider.of<OfferProvider>(context, listen: false);
 
@@ -130,7 +132,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
       // Check if there's an existing offer for this product
       final existingOffer = offerProvider.sentOffers.firstWhere(
-            (offer) => offer.productId == productId &&
+        (offer) =>
+            offer.productId == productId &&
             (offer.status == 'pending' || offer.status == 'counter'),
         orElse: () => throw StateError('No offer found'),
       );
@@ -187,9 +190,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   Future<void> _navigateToOfferManagement() async {
     final result = await Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => const OffersScreen(),
-      ),
+      MaterialPageRoute(builder: (context) => const OffersScreen()),
     );
 
     // Refresh offer status when returning
@@ -254,6 +255,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       _navigateToMakeOffer();
     }
   }
+
   Future<void> _startChat() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final chatProvider = Provider.of<ChatProvider>(context, listen: false);
@@ -283,9 +285,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => const Center(
-          child: CircularProgressIndicator(),
-        ),
+        builder: (context) => const Center(child: CircularProgressIndicator()),
       );
 
       // Get seller user model
@@ -348,7 +348,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
   Future<void> _shareProduct() async {
     if (_product != null) {
-      final String shareText = '''
+      final String shareText =
+          '''
       ${_product!.title}
       
       ₹${_product!.price.toStringAsFixed(0)}
@@ -391,7 +392,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   ),
                 ).then((_) => _loadProductDetails());
               },
-
             ),
             ListTile(
               leading: const Icon(LucideIcons.banknote, color: Colors.blue),
@@ -403,7 +403,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             ),
             ListTile(
               leading: const Icon(LucideIcons.trash2, color: Colors.red),
-              title: const Text('Delete Product', style: TextStyle(color: Colors.red)),
+              title: const Text(
+                'Delete Product',
+                style: TextStyle(color: Colors.red),
+              ),
               onTap: () {
                 Navigator.pop(context);
                 _showDeleteConfirmation();
@@ -420,7 +423,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Delete Product'),
-        content: const Text('Are you sure you want to delete this product? This action cannot be undone.'),
+        content: const Text(
+          'Are you sure you want to delete this product? This action cannot be undone.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -429,7 +434,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           TextButton(
             onPressed: () async {
               Navigator.pop(context);
-              final productProvider = Provider.of<ProductProvider>(context, listen: false);
+              final productProvider = Provider.of<ProductProvider>(
+                context,
+                listen: false,
+              );
               final success = await productProvider.deleteProduct(_product!.id);
 
               if (success) {
@@ -443,7 +451,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text('Failed to delete product: ${productProvider.errorMessage}'),
+                    content: Text(
+                      'Failed to delete product: ${productProvider.errorMessage}',
+                    ),
                     backgroundColor: Colors.red,
                   ),
                 );
@@ -479,7 +489,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               ),
             ),
             ListTile(
-              leading: const Icon(LucideIcons.messageCircle, color: Colors.orange),
+              leading: const Icon(
+                LucideIcons.messageCircle,
+                color: Colors.orange,
+              ),
               title: const Text('Chat'),
               onTap: () {
                 Navigator.pop(context);
@@ -494,7 +507,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 _makePhoneCall();
               },
             ),
-
           ],
         ),
       ),
@@ -526,386 +538,399 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           ? const Center(child: CircularProgressIndicator())
           : _product == null
           ? const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(LucideIcons.alertCircle, size: 64, color: Colors.grey),
-            SizedBox(height: 16),
-            Text('Product not found', style: TextStyle(fontSize: 18)),
-          ],
-        ),
-      )
-          : CustomScrollView(
-        slivers: [
-          // App Bar with Image Carousel
-          SliverAppBar(
-            expandedHeight: 300,
-            pinned: true,
-            flexibleSpace: FlexibleSpaceBar(
-              background: _product!.imageUrls.isNotEmpty
-                  ? ImageCarousel(
-                imageUrls: _product!.imageUrls,
-                height: 300,
-              )
-                  : Container(
-                color: Colors.grey[200],
-                child: const Center(
-                  child: Icon(
-                    LucideIcons.image,
-                    size: 64,
-                    color: Colors.grey,
-                  ),
-                ),
-              ),
-            ),
-            actions: [
-
-              IconButton(
-                onPressed: _shareProduct,
-                icon: const Icon(LucideIcons.share),
-              ),
-              if (isOwner)
-                IconButton(
-                  onPressed: _showEditDeleteOptions,
-                  icon: const Icon(LucideIcons.moreVertical),
-                ),
-            ],
-          ),
-
-          // Product Details
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Price and Title
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '₹${_product!.price.toStringAsFixed(0)}',
-                              style: const TextStyle(
-                                fontSize: 28,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFF002F34),
+                  Icon(LucideIcons.alertCircle, size: 64, color: Colors.grey),
+                  SizedBox(height: 16),
+                  Text('Product not found', style: TextStyle(fontSize: 18)),
+                ],
+              ),
+            )
+          : CustomScrollView(
+              slivers: [
+                // App Bar with Image Carousel
+                SliverAppBar(
+                  expandedHeight: 300,
+                  pinned: true,
+                  flexibleSpace: FlexibleSpaceBar(
+                    background: _product!.imageUrls.isNotEmpty
+                        ? ImageCarousel(
+                            imageUrls: _product!.imageUrls,
+                            height: 300,
+                          )
+                        : Container(
+                            color: Colors.grey[200],
+                            child: const Center(
+                              child: Icon(
+                                LucideIcons.image,
+                                size: 64,
+                                color: Colors.grey,
                               ),
                             ),
-                            const SizedBox(height: 8),
-                            Text(
-                              _product!.title,
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w600,
+                          ),
+                  ),
+                  actions: [
+                    IconButton(
+                      onPressed: _shareProduct,
+                      icon: const Icon(LucideIcons.share),
+                    ),
+                    if (isOwner)
+                      IconButton(
+                        onPressed: _showEditDeleteOptions,
+                        icon: const Icon(LucideIcons.moreVertical),
+                      ),
+                  ],
+                ),
+
+                // Product Details
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Price and Title
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    '₹${_product!.price.toStringAsFixed(0)}',
+                                    style: const TextStyle(
+                                      fontSize: 28,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFF078893),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    _product!.title,
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ],
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-// Existing offer notification
-                  if (_hasExistingOffer && !isOwner)
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 16),
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.blue[50],
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Colors.blue[200]!),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(LucideIcons.banknote, color: Colors.blue[700], size: 20),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              'You have an offer of ₹${_existingOfferAmount?.toStringAsFixed(0)} on this product',
-                              style: TextStyle(
-                                color: Colors.blue[700],
-                                fontWeight: FontWeight.w500,
-                              ),
+                        const SizedBox(height: 16),
+                        // Existing offer notification
+                        if (_hasExistingOffer && !isOwner)
+                          Container(
+                            margin: const EdgeInsets.only(bottom: 16),
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.blue[50],
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: Colors.blue[200]!),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  LucideIcons.banknote,
+                                  color: Colors.blue[700],
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    'You have an offer of ₹${_existingOfferAmount?.toStringAsFixed(0)} on this product',
+                                    style: TextStyle(
+                                      color: Colors.blue[700],
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                                TextButton(
+                                  onPressed: _navigateToOfferManagement,
+                                  child: const Text('View'),
+                                ),
+                              ],
                             ),
                           ),
-                          TextButton(
-                            onPressed: _navigateToOfferManagement,
-                            child: const Text('View'),
-                          ),
-                        ],
-                      ),
-                    ),
-                  // Category and Condition
-                  Row(
-                    children: [
-                      Chip(
-                        label: Text(_product!.categoryDisplayName),
-                        backgroundColor: Colors.blue[50],
-                      ),
-                      const SizedBox(width: 8),
-                      Chip(
-                        label: Text(_product!.conditionDisplayName),
-                        backgroundColor: Colors.green[50],
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
+                        // Category and Condition
+                        Row(
+                          children: [
+                            Chip(
+                              label: Text(_product!.categoryDisplayName),
+                              backgroundColor: Colors.blue[50],
+                            ),
+                            const SizedBox(width: 8),
+                            Chip(
+                              label: Text(_product!.conditionDisplayName),
+                              backgroundColor: Colors.green[50],
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
 
-                  // Description
-                  const Text(
-                    'Description',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    _product!.description,
-                    style: const TextStyle(fontSize: 16, height: 1.5),
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Tags
-                  if (_product!.tags.isNotEmpty) ...[
-                    const Text(
-                      'Tags',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: _product!.tags.map((tag) {
-                        return Chip(
-                          label: Text('#$tag'),
-                          backgroundColor: Colors.grey[200],
-                        );
-                      }).toList(),
-                    ),
-                    const SizedBox(height: 24),
-                  ],
-
-                  // Location and Posted Time
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        children: [
-                          Row(
-                            children: [
-                              const Icon(LucideIcons.mapPin, size: 20),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  _product!.location,
-                                  style: const TextStyle(fontSize: 16),
-                                ),
-                              ),
-                            ],
+                        // Description
+                        const Text(
+                          'Description',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
                           ),
-                          const SizedBox(height: 12),
-                          Row(
-                            children: [
-                              const Icon(LucideIcons.clock, size: 20),
-                              const SizedBox(width: 8),
-                              Text(
-                                'Posted ${_getTimeAgo(_product!.createdAt)}',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.grey[600],
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 12),
-                          Row(
-                            children: [
-                              const Icon(LucideIcons.eye, size: 20),
-                              const SizedBox(width: 8),
-                              Text(
-                                '${_product!.views} views',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.grey[600],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          _product!.description,
+                          style: const TextStyle(fontSize: 16, height: 1.5),
+                        ),
+                        const SizedBox(height: 24),
 
-                  // Seller Info
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
+                        // Tags
+                        if (_product!.tags.isNotEmpty) ...[
                           const Text(
-                            'Seller Information',
+                            'Tags',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: _product!.tags.map((tag) {
+                              return Chip(
+                                label: Text('#$tag'),
+                                backgroundColor: Colors.grey[200],
+                              );
+                            }).toList(),
+                          ),
+                          const SizedBox(height: 24),
+                        ],
+
+                        // Location and Posted Time
+                        Card(
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Column(
+                              children: [
+                                Row(
+                                  children: [
+                                    const Icon(LucideIcons.mapPin, size: 20),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: Text(
+                                        _product!.location,
+                                        style: const TextStyle(fontSize: 16),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 12),
+                                Row(
+                                  children: [
+                                    const Icon(LucideIcons.clock, size: 20),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      'Posted ${_getTimeAgo(_product!.createdAt)}',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey[600],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 12),
+                                Row(
+                                  children: [
+                                    const Icon(LucideIcons.eye, size: 20),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      '${_product!.views} views',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey[600],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+
+                        // Seller Info
+                        Card(
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Seller Information',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+                                Row(
+                                  children: [
+                                    CircleAvatar(
+                                      backgroundColor: Colors.grey[300],
+                                      child: Text(
+                                        _product!.sellerName.isNotEmpty
+                                            ? _product!.sellerName[0]
+                                                  .toUpperCase()
+                                            : 'U',
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            _product!.sellerName,
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          // TODO: Add seller rating when available
+                                          Text(
+                                            'Member since ${_getTimeAgo(_product!.createdAt)}',
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.grey[600],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    if (!isOwner)
+                                      ElevatedButton(
+                                        onPressed: _showContactOptions,
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: const Color(
+                                            0xFF078893,
+                                          ),
+                                        ),
+                                        child: const Text('Contact'),
+                                      ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+
+                        // Related Products
+                        if (_relatedProducts.isNotEmpty) ...[
+                          const Text(
+                            'Related Products',
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           const SizedBox(height: 12),
-                          Row(
-                            children: [
-                              CircleAvatar(
-                                backgroundColor: Colors.grey[300],
-                                child: Text(
-                                  _product!.sellerName.isNotEmpty
-                                      ? _product!.sellerName[0].toUpperCase()
-                                      : 'U',
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      _product!.sellerName,
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    // TODO: Add seller rating when available
-                                    Text(
-                                      'Member since ${_getTimeAgo(_product!.createdAt)}',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.grey[600],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              if (!isOwner)
-                                ElevatedButton(
-                                  onPressed: _showContactOptions,
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xFF002F34),
-                                  ),
-                                  child: const Text('Contact'),
-                                ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Related Products
-                  if (_relatedProducts.isNotEmpty) ...[
-                    const Text(
-                      'Related Products',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    SizedBox(
-                      height: 220,
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: _relatedProducts.length,
-                        itemBuilder: (context, index) {
-                          return Container(
-                            width: 160,
-                            margin: const EdgeInsets.only(right: 12),
-                            child: ProductCard(
-                              product: _relatedProducts[index],
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => ProductDetailScreen(
-                                      productId: _relatedProducts[index].id,
-                                      product: _relatedProducts[index],
-                                    ),
+                          SizedBox(
+                            height: 220,
+                            child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: _relatedProducts.length,
+                              itemBuilder: (context, index) {
+                                return Container(
+                                  width: 160,
+                                  margin: const EdgeInsets.only(right: 12),
+                                  child: ProductCard(
+                                    product: _relatedProducts[index],
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              ProductDetailScreen(
+                                                productId:
+                                                    _relatedProducts[index].id,
+                                                product:
+                                                    _relatedProducts[index],
+                                              ),
+                                        ),
+                                      );
+                                    },
                                   ),
                                 );
                               },
                             ),
-                          );
-                        },
-                      ),
+                          ),
+                          const SizedBox(height: 24),
+                        ],
+                      ],
                     ),
-                    const SizedBox(height: 24),
-                  ],
-                ],
-              ),
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
       bottomNavigationBar: _product == null || isOwner
           ? null
           : Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.3),
-              spreadRadius: 1,
-              blurRadius: 5,
-              offset: const Offset(0, -3),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: ElevatedButton.icon(
-                onPressed:() {
-                  _navigateToMakeOffer();
-
-                },
-                icon: const Icon(LucideIcons.banknote,
-                color: Color(0xFF002F34)),
-                label: Text('Make an Offer', style: TextStyle(color: Color(0xFF002F34))
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFFFFFF),
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                ),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.3),
+                    spreadRadius: 1,
+                    blurRadius: 5,
+                    offset: const Offset(0, -3),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        _navigateToMakeOffer();
+                      },
+                      icon: const Icon(
+                        LucideIcons.banknote,
+                        color: Color(0xFF078893),
+                      ),
+                      label: Text(
+                        'Make an Offer',
+                        style: TextStyle(color: Color(0xFF078893)),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFFFFFFF),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: _startChat,
+                      icon: const Icon(LucideIcons.messageCircle),
+                      label: const Text('Chat'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF078893),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: ElevatedButton.icon(
-                onPressed: _startChat,
-                icon: const Icon(LucideIcons.messageCircle),
-                label: const Text('Chat'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF002F34),
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

@@ -19,7 +19,7 @@ class _SplashScreenState extends State<SplashScreen> {
   void _checkAuthState() {
     Future.delayed(const Duration(seconds: 2), () {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      
+
       if (authProvider.isAuthenticated) {
         Navigator.pushReplacementNamed(context, '/home');
       } else {
@@ -31,7 +31,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF002F34),
+      backgroundColor: const Color(0xFF078893),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -54,11 +54,11 @@ class _SplashScreenState extends State<SplashScreen> {
               child: const Icon(
                 Icons.storefront,
                 size: 60,
-                color: Color(0xFF002F34),
+                color: Color(0xFF078893),
               ),
             ),
             const SizedBox(height: 30),
-            
+
             // Title
             const Text(
               'Rebuy',
@@ -69,17 +69,14 @@ class _SplashScreenState extends State<SplashScreen> {
               ),
             ),
             const SizedBox(height: 10),
-            
+
             // Subtitle
             const Text(
               'Buy & Sell Everything',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.white70,
-              ),
+              style: TextStyle(fontSize: 16, color: Colors.white70),
             ),
             const SizedBox(height: 50),
-            
+
             // Loading indicator
             const CircularProgressIndicator(
               valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
