@@ -61,25 +61,61 @@ class OfferCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                if (offer.isCounterOffer)
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.orange[100],
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      'Counter Offer',
-                      style: TextStyle(
-                        fontSize: 10,
-                        color: Colors.orange[800],
-                        fontWeight: FontWeight.bold,
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (offer.isCounterOffer)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.orange[100],
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          'Counter Offer',
+                          style: TextStyle(
+                            fontSize: 10,
+                            color: Colors.orange[800],
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
+                    const SizedBox(width: 8),
+                    // Delete button
+                    if (_canDeleteOffer())
+                      PopupMenuButton<String>(
+                        onSelected: (action) => onAction(action),
+                        itemBuilder: (context) => [
+                          const PopupMenuItem(
+                            value: 'delete',
+                            child: Row(
+                              children: [
+                                Icon(LucideIcons.trash2,
+                                    size: 16, color: Colors.red),
+                                SizedBox(width: 8),
+                                Text('Delete Offer'),
+                              ],
+                            ),
+                          ),
+                        ],
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.7),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            LucideIcons.moreVertical,
+                            size: 16,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
               ],
             ),
           ),
@@ -350,6 +386,19 @@ class OfferCard extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  // Helper method to determine if offer can be deleted
+
+  bool _canDeleteOffer() {
+    // Allow deletion if:
+    // 1. It's a pending offer (not yet processed)
+    // 2. It's a rejected offer (to clean up)
+    // 3. Don't allow deletion of accepted offers that might have associated orders
+    return offer.status == OfferStatus.pending ||
+        offer.status == OfferStatus.rejected ||
+        offer.status == OfferStatus.expired;
+
   }
 
   // Helper method to determine if actions should be shown

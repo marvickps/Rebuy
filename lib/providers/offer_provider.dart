@@ -202,6 +202,63 @@ class OfferProvider with ChangeNotifier {
     }
   }
 
+  // Update offer order status - NEW METHOD
+  Future<bool> updateOfferOrderStatus(String offerId, bool hasOrder) async {
+    try {
+      _setLoading(true);
+      _clearError();
+
+      await _firestore.collection('offers').doc(offerId).update({
+        'orderCreated': hasOrder,
+        'updatedAt': Timestamp.fromDate(DateTime.now()),
+      });
+
+      // Update local data if the offer exists
+      final sentIndex = _sentOffers.indexWhere((offer) => offer.id == offerId);
+      if (sentIndex != -1) {
+        // Note: You might want to add orderCreated field to OfferModel
+        // For now, we'll just update the updatedAt timestamp
+        _sentOffers[sentIndex] = _sentOffers[sentIndex].copyWith();
+      }
+
+      final receivedIndex = _receivedOffers.indexWhere((offer) => offer.id == offerId);
+      if (receivedIndex != -1) {
+        _receivedOffers[receivedIndex] = _receivedOffers[receivedIndex].copyWith();
+      }
+
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _setError('Failed to update offer order status: $e');
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  // Delete offer - NEW METHOD
+  Future<bool> deleteOffer(String offerId) async {
+    try {
+      _setLoading(true);
+      _clearError();
+
+      // Delete from Firestore
+      await _firestore.collection('offers').doc(offerId).delete();
+
+      // Remove from local lists
+      _sentOffers.removeWhere((offer) => offer.id == offerId);
+      _receivedOffers.removeWhere((offer) => offer.id == offerId);
+
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _setError('Failed to delete offer: $e');
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
   // Load offers for current user
   Future<void> loadUserOffers(String userId) async {
     try {
