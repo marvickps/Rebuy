@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:rebuy/providers/favorite_provider.dart';
 import 'package:rebuy/providers/offer_provider.dart';
 import 'package:rebuy/providers/order_provider.dart';
+import 'package:rebuy/providers/rating_provider.dart';
 import 'package:rebuy/screens/home/components/listing_screen.dart';
 import 'package:rebuy/screens/product/offer_management.dart';
 
@@ -43,6 +44,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => OfferProvider()),
         ChangeNotifierProvider(create: (_) => FavoritesProvider()),
         ChangeNotifierProvider(create: (_) => OrderProvider()),
+        ChangeNotifierProvider(create: (_) => RatingProvider()),
       ],
       child: MaterialApp(
         title: 'Rebuy',

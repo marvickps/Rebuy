@@ -7,7 +7,6 @@ import '../../../../providers/auth_provider.dart';
 import '../../../../providers/rating_provider.dart';
 import '../../../../providers/user_provider.dart';
 
-
 class RatingDialog extends StatefulWidget {
   final OrderModel order;
   final bool isRatingSeller; // true if buyer rating seller, false if seller rating buyer
@@ -26,10 +25,12 @@ class _RatingDialogState extends State<RatingDialog> {
   int _rating = 0;
   final TextEditingController _reviewController = TextEditingController();
   bool _isSubmitting = false;
+  final FocusNode _reviewFocusNode = FocusNode();
 
   @override
   void dispose() {
     _reviewController.dispose();
+    _reviewFocusNode.dispose();
     super.dispose();
   }
 
@@ -97,7 +98,7 @@ class _RatingDialogState extends State<RatingDialog> {
     if (success) {
       Navigator.of(context).pop(true);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('Thank you for your rating!'),
           backgroundColor: Colors.green,
         ),
@@ -116,251 +117,294 @@ class _RatingDialogState extends State<RatingDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+    final availableHeight = screenHeight - keyboardHeight - 100; // Leave some margin
+
     return Dialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
       ),
       child: Container(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header
-            Row(
+        constraints: BoxConstraints(
+          maxHeight: availableHeight,
+          maxWidth: MediaQuery.of(context).size.width * 0.9,
+        ),
+        child: SingleChildScrollView(
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF078893).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Icon(
-                    LucideIcons.star,
-                    color: const Color(0xFF078893),
-                    size: 24,
-                  ),
+                // Header
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF078893).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Icon(
+                        LucideIcons.star,
+                        color: Color(0xFF078893),
+                        size: 24,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            _ratingTitle,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            _ratingSubtitle,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      icon: const Icon(LucideIcons.x),
+                      style: IconButton.styleFrom(
+                        backgroundColor: Colors.grey[100],
+                        foregroundColor: Colors.grey[600],
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                const SizedBox(height: 24),
+
+                // Product Info
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[50],
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.grey[200]!),
+                  ),
+                  child: Row(
                     children: [
-                      Text(
-                        _ratingTitle,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                      Container(
+                        width: 50,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: widget.order.productImageUrl.isNotEmpty
+                            ? ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Image.network(
+                            widget.order.productImageUrl,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Icon(
+                                LucideIcons.package,
+                                color: Colors.grey[600],
+                              );
+                            },
+                          ),
+                        )
+                            : Icon(
+                          LucideIcons.package,
+                          color: Colors.grey[600],
                         ),
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        _ratingSubtitle,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[600],
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              widget.order.productTitle,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Order #${widget.order.id.substring(0, 8)}',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
                   ),
                 ),
-                IconButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  icon: const Icon(LucideIcons.x),
-                  style: IconButton.styleFrom(
-                    backgroundColor: Colors.grey[100],
-                    foregroundColor: Colors.grey[600],
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
+                const SizedBox(height: 24),
 
-            // Product Info
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.grey[50],
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.grey[200]!),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 50,
-                    height: 50,
-                    decoration: BoxDecoration(
-                      color: Colors.grey[300],
-                      borderRadius: BorderRadius.circular(8),
+                // Rating Stars
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Rating',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                    child: widget.order.productImageUrl.isNotEmpty
-                        ? ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: Image.network(
-                        widget.order.productImageUrl,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Icon(
-                            LucideIcons.package,
-                            color: Colors.grey[600],
-                          );
+                    const SizedBox(height: 12),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(5, (index) {
+                        return GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _rating = index + 1;
+                            });
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(4),
+                            child: Icon(
+                              _rating > index ? Icons.star : Icons.star_border,
+                              size: 36,
+                              color: _rating > index
+                                  ? Colors.amber
+                                  : Colors.grey[300],
+                            ),
+                          ),
+                        );
+                      }),
+                    ),
+                    const SizedBox(height: 8),
+                    if (_rating > 0)
+                      Center(
+                        child: Text(
+                          _getRatingText(_rating),
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: _getRatingColor(_rating),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+
+                // Review Text Field
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Review (Optional)',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      constraints: BoxConstraints(
+                        maxHeight: keyboardHeight > 0 ? 100 : 120, // Reduce height when keyboard is open
+                      ),
+                      child: TextField(
+                        controller: _reviewController,
+                        focusNode: _reviewFocusNode,
+                        maxLines: keyboardHeight > 0 ? 3 : 4, // Reduce lines when keyboard is open
+                        maxLength: 500,
+                        textAlignVertical: TextAlignVertical.top,
+                        decoration: InputDecoration(
+                          hintText: 'Share your experience...',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(color: Colors.grey[300]!),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: const BorderSide(color: Color(0xFF078893)),
+                          ),
+                          contentPadding: const EdgeInsets.all(12),
+                          counterText: '', // Hide character counter to save space
+                        ),
+                        onTap: () {
+                          // Scroll to bottom when text field is focused
+                          Future.delayed(const Duration(milliseconds: 300), () {
+                            if (mounted) {
+                              Scrollable.ensureVisible(
+                                _reviewFocusNode.context!,
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.easeInOut,
+                              );
+                            }
+                          });
                         },
                       ),
-                    )
-                        : Icon(
-                      LucideIcons.package,
-                      color: Colors.grey[600],
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          widget.order.productTitle,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Order #${widget.order.id.substring(0, 8)}',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 24),
-
-            // Rating Stars
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Rating',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  ],
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 24),
+
+                // Action Buttons
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(5, (index) {
-                    return GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _rating = index + 1;
-                        });
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.all(4),
-                        child: Icon(
-                          _rating > index ? LucideIcons.star : LucideIcons.star,
-                          size: 36,
-                          color: _rating > index
-                              ? Colors.amber
-                              : Colors.grey[300],
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: _isSubmitting ? null : () => Navigator.of(context).pop(),
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide(color: Colors.grey[300]!),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: const Text('Cancel'),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: _isSubmitting ? null : _submitRating,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF078893),
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          elevation: 0,
+                        ),
+                        child: _isSubmitting
+                            ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
+                        )
+                            : const Text(
+                          'Submit Rating',
+                          style: TextStyle(fontWeight: FontWeight.w600),
                         ),
                       ),
-                    );
-                  }),
-                ),
-                if (_rating > 0)
-                  Center(
-                    child: Text(
-                      _getRatingText(_rating),
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: _getRatingColor(_rating),
-                      ),
                     ),
-                  ),
-              ],
-            ),
-            const SizedBox(height: 24),
-
-            // Review Text Field
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Review (Optional)',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                TextField(
-                  controller: _reviewController,
-                  maxLines: 4,
-                  maxLength: 500,
-                  decoration: InputDecoration(
-                    hintText: 'Share your experience...',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: Colors.grey[300]!),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(color: Color(0xFF078893)),
-                    ),
-                    contentPadding: const EdgeInsets.all(12),
-                  ),
+                  ],
                 ),
               ],
             ),
-            const SizedBox(height: 24),
-
-            // Action Buttons
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: _isSubmitting ? null : () => Navigator.of(context).pop(),
-                    style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: Colors.grey[300]!),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                    ),
-                    child: const Text('Cancel'),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: _isSubmitting ? null : _submitRating,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF078893),
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                    ),
-                    child: _isSubmitting
-                        ? const SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                      ),
-                    )
-                        : const Text('Submit Rating'),
-                  ),
-                ),
-              ],
-            ),
-          ],
+          ),
         ),
       ),
     );
