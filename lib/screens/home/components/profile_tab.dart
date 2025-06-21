@@ -1,7 +1,8 @@
-// components/profile_tab.dart
+// lib/screens/home/components/profile_tab.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rebuy/screens/home/components/profile_detail_screen.dart';
+import 'package:rebuy/screens/order/order_management_screen.dart';
 import '../../../providers/auth_provider.dart';
 
 class ProfileTab extends StatelessWidget {
@@ -48,15 +49,15 @@ class ProfileTab extends StatelessWidget {
                                   : null,
                               child: user.profileImageUrl.isEmpty
                                   ? Text(
-                                      user.name.isNotEmpty
-                                          ? user.name[0].toUpperCase()
-                                          : 'U',
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    )
+                                user.name.isNotEmpty
+                                    ? user.name[0].toUpperCase()
+                                    : 'U',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              )
                                   : null,
                             ),
                             Positioned(
@@ -156,6 +157,21 @@ class ProfileTab extends StatelessWidget {
                 subtitle: 'Track your offers and deals',
                 onTap: () {
                   Navigator.pushNamed(context, '/offers');
+                },
+              ),
+
+              _buildMenuItem(
+                context,
+                icon: Icons.receipt_long_outlined,
+                title: 'My Orders',
+                subtitle: 'Track your purchases and sales',
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const OrderManagementScreen(),
+                    ),
+                  );
                 },
               ),
 
@@ -276,12 +292,12 @@ class ProfileTab extends StatelessWidget {
   }
 
   Widget _buildMenuItem(
-    BuildContext context, {
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required VoidCallback onTap,
-  }) {
+      BuildContext context, {
+        required IconData icon,
+        required String title,
+        required String subtitle,
+        required VoidCallback onTap,
+      }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Card(
