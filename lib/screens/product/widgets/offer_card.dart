@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import '../../../models/offer_model.dart';
+import '../../../providers/order_provider.dart';
 import '../payment.dart';
+import '../order_tracking_screen.dart';
 
 class OfferCard extends StatelessWidget {
   final OfferModel offer;
@@ -590,7 +593,7 @@ class OfferCard extends StatelessWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: ElevatedButton.icon(
-                  onPressed: () => _handleOrderSupport(context),
+                  onPressed: () => {},
                   icon: const Icon(LucideIcons.messageCircle, size: 16),
                   label: const Text('Support'),
                   style: ElevatedButton.styleFrom(
@@ -621,113 +624,65 @@ class OfferCard extends StatelessWidget {
     }
   }
 
-  // Handle track order action
-  void _handleTrackOrder(BuildContext context) {
-    // Navigate to order tracking screen
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Order tracking will be available soon'),
-        backgroundColor: Color(0xFF078893),
-      ),
-    );
-    // TODO: Implement order tracking navigation
-    // Navigator.push(
-    //   context,
-    //   MaterialPageRoute(
-    //     builder: (context) => OrderTrackingScreen(offer: offer),
-    //   ),
-    // );
+  // Handle track order action - UPDATED TO NAVIGATE TO ORDER TRACKING
+  void _handleTrackOrder(BuildContext context) async {
+    try {
+      // Show loading indicator
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+
+      // Get the order provider
+      final orderProvider = Provider.of<OrderProvider>(context, listen: false);
+
+      // Load orders for the user (either buyer or seller depending on perspective)
+      String userId = isSentOffer ? offer.buyerId : offer.sellerId;
+      await orderProvider.loadUserOrders(userId);
+
+      // Find the order associated with this offer
+      final order = orderProvider.orders.firstWhere(
+            (o) => o.productId == offer.productId &&
+            o.buyerId == offer.buyerId &&
+            o.sellerId == offer.sellerId,
+        orElse: () => throw Exception('Order not found for this offer'),
+      );
+
+      // Close loading dialog
+      Navigator.of(context).pop();
+
+      // Navigate to order tracking screen
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => OrderTrackingScreen(order: order),
+        ),
+      );
+
+    } catch (e) {
+      // Close loading dialog if it's still open
+      if (Navigator.canPop(context)) {
+        Navigator.of(context).pop();
+      }
+
+      // Show error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Unable to find order: ${e.toString()}'),
+          backgroundColor: Colors.red,
+          action: SnackBarAction(
+            label: 'Retry',
+            textColor: Colors.white,
+            onPressed: () => _handleTrackOrder(context),
+          ),
+        ),
+      );
+    }
   }
 
-  // Handle order support action
-  void _handleOrderSupport(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) => Container(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            const SizedBox(height: 20),
-            const Text(
-              'Order Support',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Need help with your order? Choose an option below:',
-              style: TextStyle(color: Colors.grey[600]),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: () {
-                  Navigator.pop(context);
-                  // TODO: Implement chat with seller
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        isSentOffer
-                            ? 'Contacting seller: ${offer.sellerName}'
-                            : 'Contacting buyer: ${offer.buyerName}',
-                      ),
-                      backgroundColor: Colors.green,
-                    ),
-                  );
-                },
-                icon: const Icon(LucideIcons.messageCircle),
-                label: Text(
-                  isSentOffer ? 'Contact Seller' : 'Contact Buyer',
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF078893),
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton.icon(
-                onPressed: () {
-                  Navigator.pop(context);
-                  // TODO: Implement report issue
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Issue reporting will be available soon'),
-                      backgroundColor: Colors.orange,
-                    ),
-                  );
-                },
-                icon: const Icon(LucideIcons.flag),
-                label: const Text('Report Issue'),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.orange,
-                  side: const BorderSide(color: Colors.orange),
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-          ],
-        ),
-      ),
-    );
-  }
 
   // Show seller options after offer acceptance
   void _showSellerOptions(BuildContext context) {
@@ -895,60 +850,59 @@ class OfferCard extends StatelessWidget {
         return Colors.blue;
     }
   }
+    Widget _getStatusIcon(OfferStatus status) {
+      switch (status) {
+        case OfferStatus.pending:
+          return Icon(
+            LucideIcons.clock,
+            color: _getStatusColor(status),
+            size: 16,
+          );
+        case OfferStatus.accepted:
+          return Icon(
+            LucideIcons.checkCircle,
+            color: _getStatusColor(status),
+            size: 16,
+          );
+        case OfferStatus.rejected:
+          return Icon(
+            LucideIcons.xCircle,
+            color: _getStatusColor(status),
+            size: 16,
+          );
+        case OfferStatus.countered:
+          return Icon(
+            LucideIcons.arrowLeftRight,
+            color: _getStatusColor(status),
+            size: 16,
+          );
+        case OfferStatus.expired:
+          return Icon(
+            LucideIcons.alarmClockOff,
+            color: _getStatusColor(status),
+            size: 16,
+          );
+        case OfferStatus.paid:
+          return Icon(
+            LucideIcons.checkCircle2,
+            color: _getStatusColor(status),
+            size: 16,
+          );
+      }
+    }
 
-  Widget _getStatusIcon(OfferStatus status) {
-    switch (status) {
-      case OfferStatus.pending:
-        return Icon(
-          LucideIcons.clock,
-          color: _getStatusColor(status),
-          size: 16,
-        );
-      case OfferStatus.accepted:
-        return Icon(
-          LucideIcons.checkCircle,
-          color: _getStatusColor(status),
-          size: 16,
-        );
-      case OfferStatus.rejected:
-        return Icon(
-          LucideIcons.xCircle,
-          color: _getStatusColor(status),
-          size: 16,
-        );
-      case OfferStatus.countered:
-        return Icon(
-          LucideIcons.arrowLeftRight,
-          color: _getStatusColor(status),
-          size: 16,
-        );
-      case OfferStatus.expired:
-        return Icon(
-          LucideIcons.alarmClockOff,
-          color: _getStatusColor(status),
-          size: 16,
-        );
-      case OfferStatus.paid:
-        return Icon(
-          LucideIcons.checkCircle2,
-          color: _getStatusColor(status),
-          size: 16,
-        );
+    String _formatDateTime(DateTime dateTime) {
+      final now = DateTime.now();
+      final difference = now.difference(dateTime);
+
+      if (difference.inDays > 0) {
+        return DateFormat('MMM dd, yyyy').format(dateTime);
+      } else if (difference.inHours > 0) {
+        return '${difference.inHours}h ago';
+      } else if (difference.inMinutes > 0) {
+        return '${difference.inMinutes}m ago';
+      } else {
+        return 'Just now';
+      }
     }
   }
-
-  String _formatDateTime(DateTime dateTime) {
-    final now = DateTime.now();
-    final difference = now.difference(dateTime);
-
-    if (difference.inDays > 0) {
-      return DateFormat('MMM dd, yyyy').format(dateTime);
-    } else if (difference.inHours > 0) {
-      return '${difference.inHours}h ago';
-    } else if (difference.inMinutes > 0) {
-      return '${difference.inMinutes}m ago';
-    } else {
-      return 'Just now';
-    }
-  }
-}
