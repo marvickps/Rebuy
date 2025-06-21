@@ -115,7 +115,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
         isProcessingPayment = true;
       });
 
-      // Try multiple UPI URL schemes for better compatibility
       final upiUrls = [
         generatedQRData!, // Standard UPI URL
         'paytmmp://pay?pa=${sellerInfo?.upiId}&pn=${widget.offer.sellerName.replaceAll(' ', '%20')}&am=${widget.offer.offerAmount}&cu=INR', // Paytm
