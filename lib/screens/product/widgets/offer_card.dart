@@ -130,31 +130,31 @@ class OfferCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                   child: offer.productImageUrl.isNotEmpty
                       ? Image.network(
-                          offer.productImageUrl,
-                          width: 80,
-                          height: 80,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Container(
-                              width: 80,
-                              height: 80,
-                              color: Colors.grey[200],
-                              child: const Icon(
-                                LucideIcons.image,
-                                color: Colors.grey,
-                              ),
-                            );
-                          },
-                        )
-                      : Container(
-                          width: 80,
-                          height: 80,
-                          color: Colors.grey[200],
-                          child: const Icon(
-                            LucideIcons.image,
-                            color: Colors.grey,
-                          ),
+                    offer.productImageUrl,
+                    width: 80,
+                    height: 80,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        width: 80,
+                        height: 80,
+                        color: Colors.grey[200],
+                        child: const Icon(
+                          LucideIcons.image,
+                          color: Colors.grey,
                         ),
+                      );
+                    },
+                  )
+                      : Container(
+                    width: 80,
+                    height: 80,
+                    color: Colors.grey[200],
+                    child: const Icon(
+                      LucideIcons.image,
+                      color: Colors.grey,
+                    ),
+                  ),
                 ),
                 const SizedBox(width: 16),
 
@@ -315,6 +315,12 @@ class OfferCard extends StatelessWidget {
                     child: _buildAcceptedStatusWidget(context),
                   ),
 
+                if (offer.status == OfferStatus.paid)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 16),
+                    child: _buildPaidStatusWidget(context),
+                  ),
+
                 if (offer.status == OfferStatus.rejected)
                   Padding(
                     padding: const EdgeInsets.only(top: 16),
@@ -389,16 +395,10 @@ class OfferCard extends StatelessWidget {
   }
 
   // Helper method to determine if offer can be deleted
-
   bool _canDeleteOffer() {
-    // Allow deletion if:
-    // 1. It's a pending offer (not yet processed)
-    // 2. It's a rejected offer (to clean up)
-    // 3. Don't allow deletion of accepted offers that might have associated orders
     return offer.status == OfferStatus.pending ||
         offer.status == OfferStatus.rejected ||
         offer.status == OfferStatus.expired;
-
   }
 
   // Helper method to determine if actions should be shown
@@ -510,6 +510,103 @@ class OfferCard extends StatelessWidget {
     );
   }
 
+  // Helper method to build paid status widget
+  Widget _buildPaidStatusWidget(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.blue[50],
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.blue[200]!),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(LucideIcons.checkCircle2, color: Colors.blue[600], size: 16),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  _getPaidText(),
+                  style: TextStyle(
+                    color: Colors.blue[700],
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          if (offer.paidAt != null) ...[
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Icon(LucideIcons.calendar, size: 12, color: Colors.blue[600]),
+                const SizedBox(width: 4),
+                Text(
+                  'Paid on ${_formatDateTime(offer.paidAt!)}',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.blue[600],
+                  ),
+                ),
+              ],
+            ),
+          ],
+          if (offer.transactionId != null) ...[
+            const SizedBox(height: 4),
+            Row(
+              children: [
+                Icon(LucideIcons.receipt, size: 12, color: Colors.blue[600]),
+                const SizedBox(width: 4),
+                Expanded(
+                  child: Text(
+                    'Transaction ID: ${offer.transactionId}',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.blue[600],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () => _handleTrackOrder(context),
+                  icon: const Icon(LucideIcons.package, size: 16),
+                  label: const Text('Track Order'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: const Color(0xFF078893),
+                    side: const BorderSide(color: Color(0xFF078893)),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: () => _handleOrderSupport(context),
+                  icon: const Icon(LucideIcons.messageCircle, size: 16),
+                  label: const Text('Support'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF078893),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
   // Handle payment action
   void _handlePaymentAction(BuildContext context) {
     if (isSentOffer) {
@@ -522,6 +619,114 @@ class OfferCard extends StatelessWidget {
       // Seller should send payment request or generate delivery receipt
       _showSellerOptions(context);
     }
+  }
+
+  // Handle track order action
+  void _handleTrackOrder(BuildContext context) {
+    // Navigate to order tracking screen
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Order tracking will be available soon'),
+        backgroundColor: Color(0xFF078893),
+      ),
+    );
+    // TODO: Implement order tracking navigation
+    // Navigator.push(
+    //   context,
+    //   MaterialPageRoute(
+    //     builder: (context) => OrderTrackingScreen(offer: offer),
+    //   ),
+    // );
+  }
+
+  // Handle order support action
+  void _handleOrderSupport(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              'Order Support',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Need help with your order? Choose an option below:',
+              style: TextStyle(color: Colors.grey[600]),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.pop(context);
+                  // TODO: Implement chat with seller
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        isSentOffer
+                            ? 'Contacting seller: ${offer.sellerName}'
+                            : 'Contacting buyer: ${offer.buyerName}',
+                      ),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                },
+                icon: const Icon(LucideIcons.messageCircle),
+                label: Text(
+                  isSentOffer ? 'Contact Seller' : 'Contact Buyer',
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF078893),
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () {
+                  Navigator.pop(context);
+                  // TODO: Implement report issue
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Issue reporting will be available soon'),
+                      backgroundColor: Colors.orange,
+                    ),
+                  );
+                },
+                icon: const Icon(LucideIcons.flag),
+                label: const Text('Report Issue'),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.orange,
+                  side: const BorderSide(color: Colors.orange),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
+      ),
+    );
   }
 
   // Show seller options after offer acceptance
@@ -640,6 +845,12 @@ class OfferCard extends StatelessWidget {
         : 'You accepted this offer! 🎉';
   }
 
+  String _getPaidText() {
+    return isSentOffer
+        ? 'Payment completed successfully! 💰'
+        : 'Payment received from buyer! 💰';
+  }
+
   String _getRejectionText() {
     if (offer.isCounterOffer) {
       return isSentOffer
@@ -680,6 +891,8 @@ class OfferCard extends StatelessWidget {
         return Colors.orange;
       case OfferStatus.expired:
         return Colors.grey;
+      case OfferStatus.paid:
+        return Colors.blue;
     }
   }
 
@@ -712,6 +925,12 @@ class OfferCard extends StatelessWidget {
       case OfferStatus.expired:
         return Icon(
           LucideIcons.alarmClockOff,
+          color: _getStatusColor(status),
+          size: 16,
+        );
+      case OfferStatus.paid:
+        return Icon(
+          LucideIcons.checkCircle2,
           color: _getStatusColor(status),
           size: 16,
         );

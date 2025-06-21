@@ -6,6 +6,7 @@ enum OfferStatus {
   rejected,
   countered,
   expired,
+  paid, // New status for paid offers
 }
 
 class OfferModel {
@@ -29,6 +30,8 @@ class OfferModel {
   final String? counterOfferId; // For tracking counter offers
   final bool isCounterOffer;
   final String? originalOfferId; // Reference to original offer if this is a counter
+  final DateTime? paidAt; // New field to track payment time
+  final String? transactionId; // New field for transaction reference
 
   OfferModel({
     required this.id,
@@ -51,6 +54,8 @@ class OfferModel {
     this.counterOfferId,
     this.isCounterOffer = false,
     this.originalOfferId,
+    this.paidAt,
+    this.transactionId,
   });
 
   Map<String, dynamic> toMap() {
@@ -75,6 +80,8 @@ class OfferModel {
       'counterOfferId': counterOfferId,
       'isCounterOffer': isCounterOffer,
       'originalOfferId': originalOfferId,
+      'paidAt': paidAt != null ? Timestamp.fromDate(paidAt!) : null,
+      'transactionId': transactionId,
     };
   }
 
@@ -103,6 +110,8 @@ class OfferModel {
       counterOfferId: map['counterOfferId'],
       isCounterOffer: map['isCounterOffer'] ?? false,
       originalOfferId: map['originalOfferId'],
+      paidAt: map['paidAt'] != null ? _parseDateTime(map['paidAt']) : null,
+      transactionId: map['transactionId'],
     );
   }
 
@@ -132,6 +141,8 @@ class OfferModel {
     OfferStatus? status,
     String? message,
     String? counterOfferId,
+    DateTime? paidAt,
+    String? transactionId,
   }) {
     return OfferModel(
       id: id,
@@ -154,6 +165,8 @@ class OfferModel {
       counterOfferId: counterOfferId ?? this.counterOfferId,
       isCounterOffer: isCounterOffer,
       originalOfferId: originalOfferId,
+      paidAt: paidAt ?? this.paidAt,
+      transactionId: transactionId ?? this.transactionId,
     );
   }
 
@@ -169,10 +182,13 @@ class OfferModel {
         return 'Countered';
       case OfferStatus.expired:
         return 'Expired';
+      case OfferStatus.paid:
+        return 'Paid';
     }
   }
 
   bool get isExpired => DateTime.now().isAfter(expiresAt);
+  bool get isPaid => status == OfferStatus.paid;
 
   double get discountPercentage {
     if (originalPrice == 0) return 0;
