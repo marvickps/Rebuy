@@ -4,14 +4,14 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../models/order_model.dart';
 import '../../providers/order_provider.dart';
 import '../../providers/auth_provider.dart';
-import 'widgets/order_header_widget.dart';
-import 'widgets/order_timeline_widget.dart';
-import 'widgets/product_details_widget.dart';
-import 'widgets/shipping_info_widget.dart';
+import 'widgets/order/order_header_widget.dart';
+import 'widgets/order/order_timeline_widget.dart';
+import 'widgets/order/product_details_widget.dart';
+import 'widgets/order/shipping_info_widget.dart';
 import 'widgets/delivery_address_widget.dart';
-import 'widgets/order_details_widget.dart';
-import 'widgets/order_actions_widget.dart';
-import 'widgets/order_notes_widget.dart';
+import 'widgets/order/order_details_widget.dart';
+import 'widgets/order/order_actions_widget.dart';
+import 'widgets/order/order_notes_widget.dart';
 
 
 class OrderTrackingScreen extends StatefulWidget {

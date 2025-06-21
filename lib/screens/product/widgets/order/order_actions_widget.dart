@@ -2,8 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import '../../../models/order_model.dart';
-import '../../../providers/order_provider.dart';
+import '../../../../models/order_model.dart';
+import '../../../../providers/order_provider.dart';
 import 'order_dialogs.dart';
 
 class OrderActionsWidget extends StatelessWidget {

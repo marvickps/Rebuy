@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:intl/intl.dart';
 import 'package:rebuy/screens/product/widgets/timeline_step_widget.dart';
-import '../../../models/order_model.dart';
+import '../../../../models/order_model.dart';
 
 
 class OrderTimelineWidget extends StatelessWidget {

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:intl/intl.dart';
 import 'package:rebuy/screens/product/widgets/utils/order_utils.dart';
-import '../../../models/order_model.dart';
+import '../../../../models/order_model.dart';
 
 
 class OrderHeaderWidget extends StatelessWidget {
