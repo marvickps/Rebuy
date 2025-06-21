@@ -3,8 +3,13 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../../../models/offer_model.dart';
+import '../../../models/user_model.dart';
 import '../../../providers/order_provider.dart';
 import '../payment.dart';
+import '../../../providers/chat_provider.dart';
+import '../../../providers/auth_provider.dart';
+import '../../../providers/product_provider.dart';
+import '../../chat/screen/chat_screen.dart';
 import '../order_tracking_screen.dart';
 
 class OfferCard extends StatelessWidget {
@@ -593,7 +598,7 @@ class OfferCard extends StatelessWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: ElevatedButton.icon(
-                  onPressed: () => {},
+                  onPressed: () => _handleSupportAction(context),
                   icon: const Icon(LucideIcons.messageCircle, size: 16),
                   label: const Text('Support'),
                   style: ElevatedButton.styleFrom(
@@ -789,6 +794,134 @@ class OfferCard extends StatelessWidget {
     return isSentOffer ? 'To: ${offer.sellerName}' : 'From: ${offer.buyerName}';
   }
 
+  void _handleSupportAction(BuildContext context) async {
+    try {
+      // Show loading indicator
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final chatProvider = Provider.of<ChatProvider>(context, listen: false);
+      final productProvider = Provider.of<ProductProvider>(context, listen: false);
+
+      if (authProvider.user == null) {
+        Navigator.of(context).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Please login to start a chat'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+
+      // Get the product details
+      final product = await productProvider.getProduct(offer.productId);
+      if (product == null) {
+        Navigator.of(context).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Product not found'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+
+      // Determine who the current user should chat with
+      String otherUserId;
+      String otherUserName;
+
+      if (isSentOffer) {
+        // Current user is buyer, chat with seller
+        otherUserId = offer.sellerId;
+        otherUserName = offer.sellerName;
+      } else {
+        // Current user is seller, chat with buyer
+        otherUserId = offer.buyerId;
+        otherUserName = offer.buyerName;
+      }
+
+      // Create UserModel objects for chat creation
+      final currentUser = UserModel(
+        uid: authProvider.user!.uid,
+        name: authProvider.user!.displayName ?? 'User',
+        email: authProvider.user!.email ?? '',
+        phone: authProvider.user!.phoneNumber ?? '',
+        profileImageUrl: authProvider.user!.photoURL ?? '',
+        createdAt: DateTime.now(),
+      );
+
+      final otherUser = UserModel(
+        uid: otherUserId,
+        name: otherUserName,
+        email: '', // We don't have this info in the offer
+        phone: '',
+        profileImageUrl: '',
+        createdAt: DateTime.now(),
+      );
+
+      // Determine buyer and seller for chat creation
+      UserModel buyer, seller;
+      if (isSentOffer) {
+        buyer = currentUser;
+        seller = otherUser;
+      } else {
+        buyer = otherUser;
+        seller = currentUser;
+      }
+
+      // Create or get existing chat
+      final chatId = await chatProvider.createOrGetChat(
+        product: product,
+        buyer: buyer,
+        seller: seller,
+      );
+
+      // Close loading dialog
+      Navigator.of(context).pop();
+
+      if (chatId != null) {
+        // Navigate to chat screen
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ChatScreen(
+              chatId: chatId,
+              productTitle: product.title,
+              otherUserName: otherUserName,
+            ),
+          ),
+        );
+      } else {
+        // Show error if chat creation failed
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to start chat: ${chatProvider.errorMessage}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      // Close loading dialog if it's still open
+      if (Navigator.canPop(context)) {
+        Navigator.of(context).pop();
+      }
+
+      // Show error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error starting chat: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
   String _getAcceptedText() {
     if (offer.isCounterOffer) {
       return isSentOffer
