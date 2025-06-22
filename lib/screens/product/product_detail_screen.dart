@@ -215,6 +215,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
 
     // Refresh offer status when returning
+
     // if (result == true) {
     //   final authProvider = Provider.of<AuthProvider>(context, listen: false);
     //   if (authProvider.user != null && _product != null) {
