@@ -1,9 +1,10 @@
-// lib/screens/home/components/profile_tab.dart
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rebuy/screens/home/components/profile_detail_screen.dart';
 import 'package:rebuy/screens/order/order_management_screen.dart';
 import '../../../providers/auth_provider.dart';
+import '../review_listing.dart';
 
 class ProfileTab extends StatelessWidget {
   const ProfileTab({super.key});
@@ -187,11 +188,16 @@ class ProfileTab extends StatelessWidget {
 
               _buildMenuItem(
                 context,
-                icon: Icons.settings_outlined,
-                title: 'Settings',
-                subtitle: 'App preferences and settings',
+                icon: Icons.star_outline,
+                title: 'My Reviews',
+                subtitle: 'View your ratings and reviews',
                 onTap: () {
-                  // Navigate to settings
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ReviewsScreen(),
+                    ),
+                  );
                 },
               ),
 
